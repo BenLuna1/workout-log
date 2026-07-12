@@ -365,7 +365,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
   <div class="ebs"><button class="ecb" id="imp-go">Import data</button><button class="ecl2" id="imp-cl">Cancel</button></div>
 </div></div>
 
-<div class="sp open" id="sp">
+<div class="sp open" id="sp" style="">
   <div class="set-menu" id="set-menu">
     <div class="smi" id="exp-btn"><span>⬇ Export data</span><span style="font-size:11px;color:var(--tm)">download JSON backup</span></div>
     <div class="smi" id="imp-btn"><span>⬆ Import data</span><span style="font-size:11px;color:var(--tm)">restore from JSON</span></div>
@@ -592,7 +592,20 @@ function toggleLeg(id){
 }
 ld();updMacro();jtt();toast('Data imported');}catch(e){toast('Invalid JSON');}});
 // Settings
-function openSettings(){const sp=document.getElementById('sp');sp.classList.toggle('open');const sm=document.getElementById('set-menu');if(sp.classList.contains('open')){showSetMenu();}else{sm.style.display='';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}}
+function openSettings(){
+  const sp=document.getElementById('sp');
+  sp.classList.toggle('open');
+  const sm=document.getElementById('set-menu');
+  if(sp.classList.contains('open')){
+    // Block interaction briefly to prevent tap bleed-through on mobile
+    sp.style.pointerEvents='none';
+    setTimeout(()=>sp.style.pointerEvents='',320);
+    showSetMenu();
+  }else{
+    sm.style.display='';
+    document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));
+  }
+}
 function showSetMenu(){document.getElementById('set-menu').style.display='';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}
 function openSetPanel(id){document.getElementById('set-menu').style.display='none';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));document.getElementById('set-'+id).classList.add('open');if(id==='phases')rdrPT();if(id==='library')rdrLT();if(id==='cf'){document.getElementById('cfs').value=CF.Strength;document.getElementById('cfw').value=CF.Walking;document.getElementById('cfo').value=CF.Other;}}
 document.getElementById('set-btn').addEventListener('click',openSettings);
