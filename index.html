@@ -96,10 +96,15 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .vt.act{background:var(--bg-section);color:var(--tx);border-color:var(--b1);font-weight:600}
 /* Ribbon */
 .rib-w{padding:.85rem 1.25rem .55rem;border-bottom:1px solid var(--b0);background:var(--bg-root);display:flex;justify-content:center}
-.rib-s{overflow-x:auto;scrollbar-width:none;padding-bottom:2px;max-width:100%;transition:mask-image .2s,-webkit-mask-image .2s}
-.rib-s::-webkit-scrollbar{display:none}
-.rib-s.scrolling{-webkit-mask-image:linear-gradient(to right,transparent 0,black 32px,black calc(100% - 32px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,black 32px,black calc(100% - 32px),transparent 100%)}
-.sg{display:flex;gap:3px;width:max-content}
+/* Fixed 7-tile window — no overflow, drag updates SO directly */
+.rib-s{position:relative;overflow:hidden;padding-bottom:2px;touch-action:pan-y;cursor:grab;user-select:none}
+.rib-s:active{cursor:grabbing}
+.sg{display:flex;gap:3px;width:max-content;transition:transform .18s cubic-bezier(.25,.46,.45,.94)}
+.sg.dragging{transition:none}
+/* Edge fade — always visible as affordance for draggability */
+.rib-s::before,.rib-s::after{content:'';position:absolute;top:0;bottom:0;width:28px;pointer-events:none;z-index:3;transition:opacity .2s}
+.rib-s::before{left:0;background:linear-gradient(to right,var(--bg-root),transparent)}
+.rib-s::after{right:0;background:linear-gradient(to left,var(--bg-root),transparent)}
 .dc{border-radius:var(--r1);border:1px solid var(--b1);padding:5px 4px 4px;text-align:center;font-size:11px;position:relative;user-select:none;cursor:pointer;transition:border-color .12s,background .12s;width:56px;flex-shrink:0;background:var(--bg-root)}
 .dc:hover:not(.rdc){background:var(--bg-section);border-color:var(--b2)}
 .dc.past{opacity:.38}
@@ -406,7 +411,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 </div>
 
 <div id="lv">
-  <div class="rib-w"><div class="rib-s"><div class="sg" id="sg"></div></div></div>
+  <div class="rib-w"><div class="rib-s" id="rib-s"><div class="sg" id="sg"></div></div></div>
   <div class="wtw"><div class="wts" id="wt"></div></div>
   <div id="sa"></div>
 </div>
@@ -599,65 +604,111 @@ document.getElementById('home-btn').addEventListener('click',()=>jtt());
 ['prog','meas','week'].forEach(v=>{document.getElementById('vt-'+v).addEventListener('click',()=>{CV=v;['prog','meas','week'].forEach(id=>document.getElementById('vt-'+id).classList.toggle('act',v===id));document.getElementById('lv').classList.add('hide');document.getElementById('pv').classList.toggle('open',v==='prog');document.getElementById('mv').classList.toggle('open',v==='meas');document.getElementById('wv').classList.toggle('open',v==='week');if(v==='prog')rdrProg();if(v==='meas')rdrMeas();if(v==='week')rdrWeek();});});
 function showLog(){CV='log';['prog','meas','week'].forEach(id=>{document.getElementById('vt-'+id).classList.remove('act');});document.getElementById('lv').classList.remove('hide');document.getElementById('pv').classList.remove('open');document.getElementById('mv').classList.remove('open');document.getElementById('wv').classList.remove('open');}
 // Ribbon
+// ── Ribbon: fixed 7-tile window, drag scrolls through all dates ──────────
+const TILE_W=59; // tile width (56px) + gap (3px)
+let _ribDragActive=false,_ribStartX=0,_ribStartSO=0,_ribDragDelta=0,_ribSnapTimer=null;
+
 function rdrS(){
   const el=document.getElementById('sg');el.innerHTML='';const to=tOff();
   const centre=SO!==null?SO:to;
-  // Window always starts on Saturday (PS is a Saturday, so each week begins at offset % 7 === 0)
-  const start=Math.max(0,centre-centre%7);
-  const end=Math.min(TW*7-1,start+6);
-  for(let o=start;o<=end;o++){
+  // Show 7 tiles centred on SO: positions -3 to +3
+  for(let rel=-3;rel<=3;rel++){
+    let o=centre+rel;
+    // Rubber-band at boundaries
+    const maxO=TW*7-1;
+    if(o<0)o=0;if(o>maxO)o=maxO;
     const sv=!!SV[o];const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
-    const cell=document.createElement('div');let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===SO)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
+    const cell=document.createElement('div');
+    let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===centre)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
+    cell.className=cls;cell.dataset.off=o;cell.dataset.rel=rel;
+    const sessLabel=isR(o)?'<div class="dsd" style="color:#c8897a">R</div>':(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
+    cell.innerHTML='<div class="ddn">'+fmtD3(o)+'</div><div class="ddt">'+fmtDM(o)+'</div>'+sessLabel;
+    // Tap to select (only if not dragging)
+    cell.addEventListener('click',()=>{if(Math.abs(_ribDragDelta)<4)selDay(o);});
+    el.appendChild(cell);
+  }
+  // Size the container to exactly 7 tiles
+  const rs=document.getElementById('rib-s');if(!rs)return;
+  const totalW=7*TILE_W-3; // 7 tiles, 6 gaps
+  rs.style.width=totalW+'px';
+  el.style.transform='translateX(0)';
+  initRibDrag(rs,el);
+  // Wire week tab strip click-drag
+  const wts2=document.querySelector('.wts');
+  if(wts2&&!wts2._dragWired){wts2._dragWired=true;let _wtDrag=false,_wtStartX=0,_wtStartSL=0;wts2.addEventListener('mousedown',e=>{_wtDrag=true;_wtStartX=e.pageX;_wtStartSL=wts2.scrollLeft;wts2.style.cursor='grabbing';});window.addEventListener('mousemove',e=>{if(!_wtDrag)return;e.preventDefault();wts2.scrollLeft=_wtStartSL-(e.pageX-_wtStartX);});window.addEventListener('mouseup',()=>{if(!_wtDrag)return;_wtDrag=false;wts2.style.cursor='';});}
+}
+
+function initRibDrag(rs,el){
+  // Remove old listeners by replacing with clone
+  const rs2=rs.cloneNode(false);while(rs.firstChild)rs2.appendChild(rs.firstChild);rs.parentNode.replaceChild(rs2,rs);
+  rs2.appendChild(el);
+  const wrap=rs2;
+
+  const onStart=(clientX)=>{
+    _ribDragActive=true;_ribStartX=clientX;_ribStartSO=SO;_ribDragDelta=0;
+    el.classList.add('dragging');clearTimeout(_ribSnapTimer);
+  };
+  const onMove=(clientX)=>{
+    if(!_ribDragActive)return;
+    _ribDragDelta=clientX-_ribStartX;
+    // Convert px to day offset
+    let dayShift=Math.round(-_ribDragDelta/TILE_W);
+    let newSO=_ribStartSO+dayShift;
+    const maxO=TW*7-1;
+    // Rubber-band at edges
+    if(newSO<0){newSO=Math.round(newSO*0.2);}
+    else if(newSO>maxO){newSO=maxO+Math.round((newSO-maxO)*0.2);}
+    else{newSO=Math.max(0,Math.min(maxO,newSO));}
+    SO=newSO;
+    // Live-update tiles without re-initialising drag
+    updateRibTiles(el);
+  };
+  const onEnd=()=>{
+    if(!_ribDragActive)return;
+    _ribDragActive=false;el.classList.remove('dragging');
+    // Clamp SO
+    SO=Math.max(0,Math.min(TW*7-1,SO));
+    // Snap to Saturday of current week
+    const snapSO=SO-(SO%7);
+    SO=Math.max(0,Math.min(TW*7-1,snapSO));
+    CW=o2w(SO);
+    rdrW();rdrS();rdrSA();
+  };
+  // Mouse
+  wrap.addEventListener('mousedown',e=>{e.preventDefault();onStart(e.clientX);});
+  window.addEventListener('mousemove',e=>{if(!_ribDragActive)return;e.preventDefault();onMove(e.clientX);});
+  window.addEventListener('mouseup',()=>{if(_ribDragActive)onEnd();});
+  // Touch
+  wrap.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX);},{passive:true});
+  wrap.addEventListener('touchmove',e=>{onMove(e.touches[0].clientX);},{passive:true});
+  wrap.addEventListener('touchend',()=>{setTimeout(onEnd,60);});
+}
+
+function updateRibTiles(el){
+  const to=tOff();const centre=SO;
+  const cells=el.querySelectorAll('.dc');
+  cells.forEach((cell,i)=>{
+    const rel=i-3;let o=centre+rel;
+    const maxO=TW*7-1;if(o<0)o=0;if(o>maxO)o=maxO;
+    const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
+    const sv=!!SV[o];
+    let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===centre)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
     cell.className=cls;cell.dataset.off=o;
     const sessLabel=isR(o)?'<div class="dsd" style="color:#c8897a">R</div>':(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
     cell.innerHTML='<div class="ddn">'+fmtD3(o)+'</div><div class="ddt">'+fmtDM(o)+'</div>'+sessLabel;
-    cell.addEventListener('click',()=>selDay(o));
-    el.appendChild(cell);
-  }
-  // Snap ribbon to week on release + edge-advance with high threshold to avoid accidental swipe
-  const rs=document.querySelector('.rib-s');if(!rs)return;
-  rs.onscroll=null;rs.onmouseup=null;rs.ontouchend=null;
-  // Snap to current week's Saturday on pointer release
-  const snapToWeek=()=>{
-    const visible=rs.getBoundingClientRect();
-    const cells=rs.querySelectorAll('.dc');
-    let best=null,bestDist=Infinity;
-    cells.forEach(c=>{const r=c.getBoundingClientRect();const cx=r.left+r.width/2;const dist=Math.abs(cx-visible.left);if(dist<bestDist){bestDist=dist;best=c;}});
-    if(best){const o=parseInt(best.dataset.off);const snapSO=o-(o%7);if(snapSO!==SO){SO=Math.max(0,Math.min(TW*7-1,snapSO));CW=o2w(SO);rdrW();rdrS();rdrSA();}}
-  };
-  rs.addEventListener('touchend',()=>setTimeout(snapToWeek,80));
-  // Click-drag to scroll ribbon on desktop
-  let _rsDrag=false,_rsStartX=0,_rsStartSL=0,_rsFadeTimer=null;
-  const showFade=(el)=>{el.classList.add('scrolling');clearTimeout(_rsFadeTimer);_rsFadeTimer=setTimeout(()=>el.classList.remove('scrolling'),600);};
-  rs.addEventListener('mousedown',e=>{_rsDrag=true;_rsStartX=e.pageX;_rsStartSL=rs.scrollLeft;rs.style.cursor='grabbing';rs.style.userSelect='none';showFade(rs);});
-  window.addEventListener('mousemove',e=>{if(!_rsDrag)return;e.preventDefault();const dx=e.pageX-_rsStartX;rs.scrollLeft=_rsStartSL-dx;showFade(rs);});
-  window.addEventListener('mouseup',e=>{if(!_rsDrag)return;_rsDrag=false;rs.style.cursor='';rs.style.userSelect='';snapToWeek();});
-  rs.addEventListener('scroll',()=>showFade(rs));
-  // Also wire week tab strip for click-drag
-  const wts2=document.querySelector('.wts');
-  if(wts2){let _wtDrag=false,_wtStartX=0,_wtStartSL=0;const showFadeWt=()=>{wts2.classList.add('scrolling');clearTimeout(_rsFadeTimer);_rsFadeTimer=setTimeout(()=>wts2.classList.remove('scrolling'),600);};wts2.addEventListener('scroll',()=>showFadeWt());wts2.addEventListener('mousedown',e=>{_wtDrag=true;_wtStartX=e.pageX;_wtStartSL=wts2.scrollLeft;wts2.style.cursor='grabbing';wts2.style.userSelect='none';showFadeWt();});window.addEventListener('mousemove',e=>{if(!_wtDrag)return;e.preventDefault();wts2.scrollLeft=_wtStartSL-(e.pageX-_wtStartX);showFadeWt();});window.addEventListener('mouseup',()=>{if(!_wtDrag)return;_wtDrag=false;wts2.style.cursor='';wts2.style.userSelect='';});}
-  // Edge-advance: only fires after deliberate pause at edge (threshold 4px, debounce 400ms for mobile)
-  let _rsTimer=null;
-  rs.addEventListener('scroll',()=>{
-    clearTimeout(_rsTimer);
-    _rsTimer=setTimeout(()=>{
-      const atLeft=rs.scrollLeft<4;
-      const atRight=rs.scrollLeft>rs.scrollWidth-rs.clientWidth-4;
-      if(atLeft&&SO>=7){SO=Math.max(0,SO-7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
-      else if(atRight&&SO<TW*7-7){SO=Math.min(TW*7-1,SO+7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
-    },400);
+    cell.onclick=()=>{if(Math.abs(_ribDragDelta)<4)selDay(o);};
   });
 }
-function selDay(o){SO=o;CW=o2w(o);if(!isR(o)&&DS[o])CS=DS[o];showLog();rdrW();rdrSel();rdrSA();}
-function rdrSel(){const to=tOff();document.querySelectorAll('#sg .dc').forEach(c=>{const o=parseInt(c.dataset.off);c.classList.toggle('past',o<to);c.classList.toggle('tdc',o===to);c.classList.toggle('adc',o===SO);});}
+function selDay(o){SO=o;CW=o2w(o);if(!isR(o)&&DS[o])CS=DS[o];showLog();rdrW();rdrS();rdrSA();}
+function rdrSel(){const el=document.getElementById('sg');if(el)updateRibTiles(el);}
 function rdrW(){
   const el=document.getElementById('wt');el.innerHTML='';
-  for(let w=1;w<=TW;w++){const ph=phFor(dfo(w2o(w)+6));const col=phCol(ph);const b=document.createElement('button');b.className='wb'+(w===CW?' aw':'');b.textContent='W'+w;if(col){b.style.borderColor=col;if(w===CW){b.style.background=col+'18';b.style.color=col;b.style.borderWidth='2px';}}b.addEventListener('click',()=>{CW=w;SO=w2o(w);rdrW();rdrS();rdrSA();});el.appendChild(b);}
+  for(let w=1;w<=TW;w++){const ph=phFor(dfo(w2o(w)+6));const col=phCol(ph);const b=document.createElement('button');b.className='wb'+(w===CW?' aw':'');b.textContent='W'+w;if(col){b.style.borderColor=col;if(w===CW){b.style.background=col+'18';b.style.color=col;b.style.borderWidth='2px';}}b.addEventListener('click',()=>{CW=w;SO=w2o(w)+3;rdrW();rdrS();rdrSA();});el.appendChild(b);}
   setTimeout(()=>{const a=el.querySelector('.wb.aw');if(a)a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});},50);
 }
 function scrollToWeek(w){const cell=document.querySelector('#sg .dc[data-off="'+w2o(w)+'"]');if(cell)cell.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});}
 function scrollToDay(o){const cell=document.querySelector('#sg .dc[data-off="'+o+'"]');if(cell)cell.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});}
-function jtt(){const to=tOff();CW=Math.max(1,o2w(to));SO=to;if(!isR(to)&&DS[to])CS=DS[to];showLog();rdrW();rdrS();rdrSA();setTimeout(()=>scrollToDay(to),150);}
+function jtt(){const to=tOff();CW=Math.max(1,o2w(to));SO=to;if(!isR(to)&&DS[to])CS=DS[to];showLog();rdrW();rdrS();rdrSA();}
 // Session area
 function rdrSA(){
   const area=document.getElementById('sa');const o=aOff();area.innerHTML='';
