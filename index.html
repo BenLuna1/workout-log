@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Training Log · Ben</title>
@@ -342,14 +340,12 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
   <div>
     <div class="hdr-t">Training Log<span class="hdr-v">v42</span></div>
     <div class="hdr-m">
-      <span id="plbl" style="font-size:12px;font-weight:500;color:var(--ts)">—</span>
-      <span class="mbadge neutral" id="pbadge">—</span>
-      <span class="mbadge neutral" id="pdet">—</span>
+      <span id="plbl" style="font-size:12px;font-weight:500;color:var(--ts)">Cut B1</span>
+      <span class="mbadge cut" id="pbadge">2000 kcal</span>
+      <span class="mbadge neutral" id="pdet">185P / 70F / 185C</span>
     </div>
   </div>
   <div class="hdr-b">
-    <button class="ibtn" id="imp-btn">⬆ Import</button>
-    <button class="ibtn" id="exp-btn">⬇ Export</button>
     <button class="ibtn" id="set-btn">⚙ Settings</button>
   </div>
 </div>
@@ -357,7 +353,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 <div class="emod" id="emod"><div class="ebox">
   <h3>Export training data</h3>
   <p>Download a JSON backup file, or copy the raw JSON below.</p>
-  <textarea class="eta" id="eta" readonly></textarea>
+  <textarea class="eta" id="eta" readonly=""></textarea>
   <div class="ebs"><button class="ecb" id="edl">⬇ Download file</button><button class="ecb" id="ecb" style="background:var(--bg-section);color:var(--ts);border-color:var(--b1)">Copy JSON</button><button class="ecl2" id="ecl2">Close</button></div>
 </div></div>
 
@@ -371,11 +367,14 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
   <div class="ebs"><button class="ecb" id="imp-go">Import data</button><button class="ecl2" id="imp-cl">Cancel</button></div>
 </div></div>
 
-<div class="sp" id="sp">
-  <div class="set-menu" id="set-menu">
+<div class="sp open" id="sp">
+  <div class="set-menu" id="set-menu" style="display: flex;">
+    <div class="smi" id="exp-btn"><span>⬇ Export data</span><span style="font-size:11px;color:var(--tm)">download JSON backup</span></div>
+    <div class="smi" id="imp-btn"><span>⬆ Import data</span><span style="font-size:11px;color:var(--tm)">restore from JSON</span></div>
     <div class="smi" data-panel="phases"><span>Phase Settings</span><span class="arr">›</span></div>
     <div class="smi" data-panel="library"><span>Exercise Library</span><span class="arr">›</span></div>
     <div class="smi" data-panel="cf"><span>Apple Watch Correction Factors</span><span class="arr">›</span></div>
+    <div class="smi" id="src-btn" style="cursor:pointer"><span>⧉ Copy HTML source</span><span style="font-size:11px;color:var(--tm)">for GitHub</span></div>
   </div>
   <div class="set-panel" id="set-phases">
     <button class="set-back" id="back-phases">‹ Settings</button>
@@ -394,10 +393,10 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
     <div class="sl">Watch correction factors</div>
     <p style="font-size:12px;color:var(--ts);margin-bottom:.65rem;line-height:1.55">Corrected = Watch × (1 − factor). Cycling uses the Keytel HR formula — no Watch correction applied.</p>
     <table class="cft">
-      <tr><td>Strength</td><td><input class="cfi" type="number" id="cfs" min="0" max="50"> %</td><td style="font-size:11px;color:var(--tm);padding-left:10px">default −25%</td></tr>
+      <tbody><tr><td>Strength</td><td><input class="cfi" type="number" id="cfs" min="0" max="50"> %</td><td style="font-size:11px;color:var(--tm);padding-left:10px">default −25%</td></tr>
       <tr><td>Walking</td><td><input class="cfi" type="number" id="cfw" min="0" max="50"> %</td><td style="font-size:11px;color:var(--tm);padding-left:10px">default −12%</td></tr>
       <tr><td>Other</td><td><input class="cfi" type="number" id="cfo" min="0" max="50"> %</td><td style="font-size:11px;color:var(--tm);padding-left:10px">default −15%</td></tr>
-    </table>
+    </tbody></table>
     <button class="abtn2" id="cfsv" style="margin-top:.75rem">Save factors</button>
   </div>
 </div>
@@ -411,9 +410,9 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 </div>
 
 <div id="lv">
-  <div class="rib-w"><div class="rib-s" id="rib-s"><div class="sg" id="sg"></div></div></div>
-  <div class="wtw"><div class="wts" id="wt"></div></div>
-  <div id="sa"></div>
+  <div class="rib-w"><div class="rib-s" id="rib-s" style="width: 410px;"><div class="sg" id="sg"><div class="dc past rdc" data-off="19"><div class="ddn">Thu</div><div class="ddt">09 Jul</div><div class="dsd" style="color:#c8897a">R</div></div><div class="dc past ldc" data-off="20"><div class="ddn">Fri</div><div class="ddt">10 Jul</div><div class="dsd" style="color:#10b981;">S3</div></div><div class="dc past" data-off="21"><div class="ddn">Sat</div><div class="ddt">11 Jul</div><div class="dsd" style="color:#6366f1;">S1</div></div><div class="dc tdc adc" data-off="22"><div class="ddn">Sun</div><div class="ddt">12 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="23"><div class="ddn">Mon</div><div class="ddt">13 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="24"><div class="ddn">Tue</div><div class="ddt">14 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="25"><div class="ddn">Wed</div><div class="ddt">15 Jul</div><div class="dsd">—</div></div></div></div></div>
+  <div class="wtw"><div class="wts" id="wt"><button class="wb" style="border-color: rgb(16, 185, 129);">W1</button><button class="wb" style="border-color: rgb(16, 185, 129);">W2</button><button class="wb" style="border-color: rgb(14, 165, 233);">W3</button><button class="wb aw" style="border-color: rgb(14, 165, 233); background: rgba(14, 165, 233, 0.094); color: rgb(14, 165, 233); border-width: 2px;">W4</button><button class="wb" style="border-color: rgb(236, 72, 153);">W5</button><button class="wb" style="border-color: rgb(139, 92, 246);">W6</button><button class="wb" style="border-color: rgb(239, 68, 68);">W7</button><button class="wb" style="border-color: rgb(16, 185, 129);">W8</button><button class="wb" style="border-color: rgb(16, 185, 129);">W9</button><button class="wb" style="border-color: rgb(16, 185, 129);">W10</button><button class="wb" style="border-color: rgb(16, 185, 129);">W11</button><button class="wb" style="border-color: rgb(16, 185, 129);">W12</button></div></div>
+  <div id="sa"><div class="sess-a"><div class="shr"><div class="stbs"><button class="stb s1">S1</button><button class="stb s2">S2</button><button class="stb s3">S3</button><button class="stb s4">S4</button><button class="stb" style="border-color: rgb(200, 137, 122);">Rest</button></div></div><div class="unph"><div class="upi">📋</div><div>No session assigned — tap a session tab to assign one</div></div></div><div class="act-w"><div class="ahdr"><span class="ahdr-l">⌚ Activity · Apple Watch</span><button class="add-ac">+ Add</button></div><div class="acs"></div></div></div>
 </div>
 
 <div id="pv"><div class="vp">
@@ -450,7 +449,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 </div></div>
 
 <div id="wv"><div class="vp" id="wc2"></div></div>
-<div class="toast" id="tst"></div>
+<div class="toast" id="tst">Source copied — paste into your .html file</div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
@@ -571,6 +570,7 @@ document.getElementById('edl').addEventListener('click',()=>{
   toast('Downloaded');
 });
 document.getElementById('ecl2').addEventListener('click',()=>document.getElementById('emod').classList.remove('show'));
+document.getElementById('src-btn').addEventListener('click',()=>{const src=document.documentElement.outerHTML;navigator.clipboard?.writeText(src).then(()=>toast('Source copied — paste into your .html file')).catch(()=>{const ta=document.createElement('textarea');ta.value=src;ta.style.cssText='position:fixed;opacity:0;top:0;left:0';document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('Source copied — paste into your .html file');}catch(e){toast('Copy failed — try a different browser');}document.body.removeChild(ta);});});
 document.getElementById('ecb').addEventListener('click',()=>{const ta=document.getElementById('eta');ta.select();try{document.execCommand('copy');toast('Copied!');}catch(e){navigator.clipboard?.writeText(ta.value).then(()=>toast('Copied!')).catch(()=>toast('Copy manually'));}});
 document.getElementById('imp-btn').addEventListener('click',()=>{document.getElementById('imp-ta').value='';document.getElementById('imp-file').value='';document.getElementById('imod').classList.add('show');});
 document.getElementById('imp-cl').addEventListener('click',()=>document.getElementById('imod').classList.remove('show'));
@@ -605,102 +605,84 @@ document.getElementById('home-btn').addEventListener('click',()=>jtt());
 function showLog(){CV='log';['prog','meas','week'].forEach(id=>{document.getElementById('vt-'+id).classList.remove('act');});document.getElementById('lv').classList.remove('hide');document.getElementById('pv').classList.remove('open');document.getElementById('mv').classList.remove('open');document.getElementById('wv').classList.remove('open');}
 // Ribbon
 // ── Ribbon: fixed 7-tile window, drag scrolls through all dates ──────────
-const TILE_W=59; // tile width (56px) + gap (3px)
-let _ribDragActive=false,_ribStartX=0,_ribStartSO=0,_ribDragDelta=0,_ribSnapTimer=null;
+const TILE_W=59;
+let _ribDrag=false,_ribX0=0,_ribSO0=0,_ribDelta=0;
+let _ribInited=false;
 
 function rdrS(){
-  const el=document.getElementById('sg');el.innerHTML='';const to=tOff();
-  const centre=SO!==null?SO:to;
-  // Show 7 tiles centred on SO: positions -3 to +3
-  for(let rel=-3;rel<=3;rel++){
-    let o=centre+rel;
-    // Rubber-band at boundaries
-    const maxO=TW*7-1;
-    if(o<0)o=0;if(o>maxO)o=maxO;
-    const sv=!!SV[o];const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
-    const cell=document.createElement('div');
-    let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===centre)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
-    cell.className=cls;cell.dataset.off=o;cell.dataset.rel=rel;
-    const sessLabel=isR(o)?'<div class="dsd" style="color:#c8897a">R</div>':(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
-    cell.innerHTML='<div class="ddn">'+fmtD3(o)+'</div><div class="ddt">'+fmtDM(o)+'</div>'+sessLabel;
-    // Tap to select (only if not dragging)
-    cell.addEventListener('click',()=>{if(Math.abs(_ribDragDelta)<4)selDay(o);});
-    el.appendChild(cell);
+  const el=document.getElementById('sg');
+  const to=tOff();const centre=SO!==null?SO:to;
+  const maxO=TW*7-1;
+  // Build or update 7 tiles
+  if(el.children.length!==7){
+    el.innerHTML='';
+    for(let i=0;i<7;i++){
+      const cell=document.createElement('div');cell.className='dc';el.appendChild(cell);
+    }
   }
-  // Size the container to exactly 7 tiles
-  const rs=document.getElementById('rib-s');if(!rs)return;
-  const totalW=7*TILE_W-3; // 7 tiles, 6 gaps
-  rs.style.width=totalW+'px';
-  el.style.transform='translateX(0)';
-  initRibDrag(rs,el);
-  // Wire week tab strip click-drag
-  const wts2=document.querySelector('.wts');
-  if(wts2&&!wts2._dragWired){wts2._dragWired=true;let _wtDrag=false,_wtStartX=0,_wtStartSL=0;wts2.addEventListener('mousedown',e=>{_wtDrag=true;_wtStartX=e.pageX;_wtStartSL=wts2.scrollLeft;wts2.style.cursor='grabbing';});window.addEventListener('mousemove',e=>{if(!_wtDrag)return;e.preventDefault();wts2.scrollLeft=_wtStartSL-(e.pageX-_wtStartX);});window.addEventListener('mouseup',()=>{if(!_wtDrag)return;_wtDrag=false;wts2.style.cursor='';});}
-}
-
-function initRibDrag(rs,el){
-  // Remove old listeners by replacing with clone
-  const rs2=rs.cloneNode(false);while(rs.firstChild)rs2.appendChild(rs.firstChild);rs.parentNode.replaceChild(rs2,rs);
-  rs2.appendChild(el);
-  const wrap=rs2;
-
-  const onStart=(clientX)=>{
-    _ribDragActive=true;_ribStartX=clientX;_ribStartSO=SO;_ribDragDelta=0;
-    el.classList.add('dragging');clearTimeout(_ribSnapTimer);
-  };
-  const onMove=(clientX)=>{
-    if(!_ribDragActive)return;
-    _ribDragDelta=clientX-_ribStartX;
-    // Convert px to day offset
-    let dayShift=Math.round(-_ribDragDelta/TILE_W);
-    let newSO=_ribStartSO+dayShift;
-    const maxO=TW*7-1;
-    // Rubber-band at edges
-    if(newSO<0){newSO=Math.round(newSO*0.2);}
-    else if(newSO>maxO){newSO=maxO+Math.round((newSO-maxO)*0.2);}
-    else{newSO=Math.max(0,Math.min(maxO,newSO));}
-    SO=newSO;
-    // Live-update tiles without re-initialising drag
-    updateRibTiles(el);
-  };
-  const onEnd=()=>{
-    if(!_ribDragActive)return;
-    _ribDragActive=false;el.classList.remove('dragging');
-    // Clamp SO
-    SO=Math.max(0,Math.min(TW*7-1,SO));
-    // Snap to Saturday of current week
-    const snapSO=SO-(SO%7);
-    SO=Math.max(0,Math.min(TW*7-1,snapSO));
-    CW=o2w(SO);
-    rdrW();rdrS();rdrSA();
-  };
-  // Mouse
-  wrap.addEventListener('mousedown',e=>{e.preventDefault();onStart(e.clientX);});
-  window.addEventListener('mousemove',e=>{if(!_ribDragActive)return;e.preventDefault();onMove(e.clientX);});
-  window.addEventListener('mouseup',()=>{if(_ribDragActive)onEnd();});
-  // Touch
-  wrap.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX);},{passive:true});
-  wrap.addEventListener('touchmove',e=>{onMove(e.touches[0].clientX);},{passive:true});
-  wrap.addEventListener('touchend',()=>{setTimeout(onEnd,60);});
-}
-
-function updateRibTiles(el){
-  const to=tOff();const centre=SO;
-  const cells=el.querySelectorAll('.dc');
-  cells.forEach((cell,i)=>{
-    const rel=i-3;let o=centre+rel;
-    const maxO=TW*7-1;if(o<0)o=0;if(o>maxO)o=maxO;
-    const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
-    const sv=!!SV[o];
+  Array.from(el.children).forEach((cell,i)=>{
+    const rel=i-3;let o=Math.max(0,Math.min(maxO,centre+rel));
+    const sv=!!SV[o];const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
     let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===centre)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
     cell.className=cls;cell.dataset.off=o;
     const sessLabel=isR(o)?'<div class="dsd" style="color:#c8897a">R</div>':(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
     cell.innerHTML='<div class="ddn">'+fmtD3(o)+'</div><div class="ddt">'+fmtDM(o)+'</div>'+sessLabel;
-    cell.onclick=()=>{if(Math.abs(_ribDragDelta)<4)selDay(o);};
+    cell.onclick=()=>{if(Math.abs(_ribDelta)<5)selDay(o);};
   });
+  // Size wrapper once
+  const rs=document.getElementById('rib-s');
+  if(rs)rs.style.width=(7*TILE_W-3)+'px';
+  // Init drag handlers once
+  if(!_ribInited){_ribInited=true;initRibDrag();}
+  // Wire week tabs click-drag once
+  const wts2=document.querySelector('.wts');
+  if(wts2&&!wts2._dw){wts2._dw=true;let d=false,x0=0,sl0=0;
+    wts2.addEventListener('mousedown',e=>{d=true;x0=e.pageX;sl0=wts2.scrollLeft;wts2.style.cursor='grabbing';e.preventDefault();});
+    window.addEventListener('mousemove',e=>{if(!d)return;wts2.scrollLeft=sl0-(e.pageX-x0);});
+    window.addEventListener('mouseup',()=>{if(d){d=false;wts2.style.cursor='';}});}
+}
+
+function initRibDrag(){
+  const rs=document.getElementById('rib-s');
+  const el=document.getElementById('sg');
+  if(!rs||!el)return;
+
+  const onStart=(clientX)=>{
+    _ribDrag=true;_ribX0=clientX;_ribSO0=SO;_ribDelta=0;
+  };
+  const onMove=(clientX)=>{
+    if(!_ribDrag)return;
+    _ribDelta=clientX-_ribX0;
+    const maxO=TW*7-1;
+    let ns=_ribSO0+Math.round(-_ribDelta/TILE_W);
+    // Rubber-band
+    if(ns<0)ns=Math.round(ns*0.25);
+    else if(ns>maxO)ns=maxO+Math.round((ns-maxO)*0.25);
+    SO=Math.max(-5,Math.min(maxO+5,ns));
+    rdrS();
+  };
+  const onEnd=()=>{
+    if(!_ribDrag)return;
+    _ribDrag=false;
+    SO=Math.max(0,Math.min(TW*7-1,SO));
+    // Snap to Saturday of week
+    SO=SO-(SO%7);
+    CW=o2w(SO);
+    rdrW();rdrS();rdrSA();
+  };
+
+  // Mouse — attach to window so drag works outside element
+  rs.addEventListener('mousedown',e=>{e.preventDefault();onStart(e.clientX);});
+  window.addEventListener('mousemove',e=>{if(_ribDrag){e.preventDefault();onMove(e.clientX);}});
+  window.addEventListener('mouseup',()=>{if(_ribDrag)onEnd();});
+
+  // Touch
+  rs.addEventListener('touchstart',e=>{onStart(e.touches[0].clientX);},{passive:true});
+  rs.addEventListener('touchmove',e=>{if(_ribDrag)onMove(e.touches[0].clientX);},{passive:true});
+  rs.addEventListener('touchend',()=>{setTimeout(onEnd,40);});
 }
 function selDay(o){SO=o;CW=o2w(o);if(!isR(o)&&DS[o])CS=DS[o];showLog();rdrW();rdrS();rdrSA();}
-function rdrSel(){const el=document.getElementById('sg');if(el)updateRibTiles(el);}
+function rdrSel(){rdrS();}
 function rdrW(){
   const el=document.getElementById('wt');el.innerHTML='';
   for(let w=1;w<=TW;w++){const ph=phFor(dfo(w2o(w)+6));const col=phCol(ph);const b=document.createElement('button');b.className='wb'+(w===CW?' aw':'');b.textContent='W'+w;if(col){b.style.borderColor=col;if(w===CW){b.style.background=col+'18';b.style.color=col;b.style.borderWidth='2px';}}b.addEventListener('click',()=>{CW=w;SO=w2o(w)+3;rdrW();rdrS();rdrSA();});el.appendChild(b);}
@@ -1210,5 +1192,6 @@ function rdrWeek(){
 function toast(msg){const t=document.getElementById('tst');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 ld();updMacro();jtt();
 </script>
-</body>
-</html>
+
+
+</body></html>
