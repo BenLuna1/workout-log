@@ -58,7 +58,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-seri
 /* Settings */
 .sp{border-bottom:1px solid var(--b1);background:var(--bg-section);display:none}
 .sp.open{display:block}
-.set-menu{display:flex;flex-direction:column;gap:3px;padding:1rem 1.25rem}
+.set-menu{display:none;flex-direction:column;gap:3px;padding:1rem 1.25rem}
+.sp.open .set-menu{display:flex}
 .smi{display:flex;align-items:center;justify-content:space-between;padding:9px 13px;border-radius:var(--r2);border:1px solid var(--b0);background:var(--bg-root);cursor:pointer;font-size:13px;color:var(--tx);font-weight:500;transition:all .12s}
 .smi:hover{background:var(--bg-card);border-color:var(--b1)}
 .smi .arr{color:var(--tm);font-size:15px}
@@ -365,7 +366,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 </div></div>
 
 <div class="sp open" id="sp">
-  <div class="set-menu" id="set-menu" style="display: flex;">
+  <div class="set-menu" id="set-menu">
     <div class="smi" id="exp-btn"><span>⬇ Export data</span><span style="font-size:11px;color:var(--tm)">download JSON backup</span></div>
     <div class="smi" id="imp-btn"><span>⬆ Import data</span><span style="font-size:11px;color:var(--tm)">restore from JSON</span></div>
     <div class="smi" data-panel="phases"><span>Phase Settings</span><span class="arr">›</span></div>
@@ -591,8 +592,8 @@ function toggleLeg(id){
 }
 ld();updMacro();jtt();toast('Data imported');}catch(e){toast('Invalid JSON');}});
 // Settings
-function openSettings(){const sp=document.getElementById('sp');sp.classList.toggle('open');if(sp.classList.contains('open'))showSetMenu();}
-function showSetMenu(){document.getElementById('set-menu').style.display='flex';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}
+function openSettings(){const sp=document.getElementById('sp');sp.classList.toggle('open');const sm=document.getElementById('set-menu');if(sp.classList.contains('open')){showSetMenu();}else{sm.style.display='';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}}
+function showSetMenu(){document.getElementById('set-menu').style.display='';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}
 function openSetPanel(id){document.getElementById('set-menu').style.display='none';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));document.getElementById('set-'+id).classList.add('open');if(id==='phases')rdrPT();if(id==='library')rdrLT();if(id==='cf'){document.getElementById('cfs').value=CF.Strength;document.getElementById('cfw').value=CF.Walking;document.getElementById('cfo').value=CF.Other;}}
 document.getElementById('set-btn').addEventListener('click',openSettings);
 document.querySelectorAll('.smi[data-panel]').forEach(item=>item.addEventListener('click',()=>openSetPanel(item.dataset.panel)));
