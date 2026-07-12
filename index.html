@@ -96,8 +96,9 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .vt.act{background:var(--bg-section);color:var(--tx);border-color:var(--b1);font-weight:600}
 /* Ribbon */
 .rib-w{padding:.85rem 1.25rem .55rem;border-bottom:1px solid var(--b0);background:var(--bg-root);display:flex;justify-content:center}
-.rib-s{overflow-x:auto;scrollbar-width:none;padding-bottom:2px;max-width:100%}
+.rib-s{overflow-x:auto;scrollbar-width:none;padding-bottom:2px;max-width:100%;transition:mask-image .2s,-webkit-mask-image .2s}
 .rib-s::-webkit-scrollbar{display:none}
+.rib-s.scrolling{-webkit-mask-image:linear-gradient(to right,transparent 0,black 32px,black calc(100% - 32px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,black 32px,black calc(100% - 32px),transparent 100%)}
 .sg{display:flex;gap:3px;width:max-content}
 .dc{border-radius:var(--r1);border:1px solid var(--b1);padding:5px 4px 4px;text-align:center;font-size:11px;position:relative;user-select:none;cursor:pointer;transition:border-color .12s,background .12s;width:56px;flex-shrink:0;background:var(--bg-root)}
 .dc:hover:not(.rdc){background:var(--bg-section);border-color:var(--b2)}
@@ -117,6 +118,7 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .wtw{padding:.5rem 1.25rem .6rem;border-bottom:1px solid var(--b1);background:var(--bg-section);display:flex;justify-content:center}
 .wts{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:1px;max-width:100%}
 .wts::-webkit-scrollbar{display:none}
+.wts.scrolling{-webkit-mask-image:linear-gradient(to right,transparent 0,black 24px,black calc(100% - 24px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,black 24px,black calc(100% - 24px),transparent 100%)}
 .wb{font-size:11px;padding:3px 9px;border-radius:var(--r1);border:1.5px solid var(--b1);background:transparent;color:var(--ts);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .12s;font-weight:500}
 .wb:hover{background:var(--bg-card);color:var(--tx)}
 .wb.aw{font-weight:700}
@@ -237,9 +239,11 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 .pleg{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:.5rem}
 .li{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ts)}
 .ld{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.chs{overflow-x:auto;scrollbar-width:thin}
+.chs{overflow-x:auto;scrollbar-width:thin;position:relative}
 .chs::-webkit-scrollbar{height:3px}
 .chs::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
+.chs-wrap{position:relative;overflow:hidden}
+.y-overlay{position:absolute;top:0;left:0;pointer-events:none;z-index:2}
 .pe{font-size:13px;color:var(--tm);padding:2rem 0;text-align:center}
 /* Measurements */
 .mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem;flex-wrap:wrap;gap:8px}
@@ -566,7 +570,17 @@ document.getElementById('ecb').addEventListener('click',()=>{const ta=document.g
 document.getElementById('imp-btn').addEventListener('click',()=>{document.getElementById('imp-ta').value='';document.getElementById('imp-file').value='';document.getElementById('imod').classList.add('show');});
 document.getElementById('imp-cl').addEventListener('click',()=>document.getElementById('imod').classList.remove('show'));
 document.getElementById('imp-file').addEventListener('change',function(){const f=this.files[0];if(!f)return;const r=new FileReader();r.onload=e=>{document.getElementById('imp-ta').value=e.target.result;};r.readAsText(f);});
-document.getElementById('imp-go').addEventListener('click',()=>{const raw=document.getElementById('imp-ta').value.trim();if(!raw){toast('No data');return;}try{const data=JSON.parse(raw);const km={DT:'d',CK:'ck',SK:'sk',RT:'r',NT:'n',DS:'ds',SV:'sv',OV:'ov',PHASES:'ph',LIB:'lib',SEX:'sex',MEAS:'meas',ACT:'act',CF:'cf',WS:'ws'};Object.keys(km).forEach(k=>{if(data[k]!==undefined)localStorage.setItem('cb42'+km[k],JSON.stringify(data[k]));});if(data.totalWeeks)localStorage.setItem('cb42wk',String(data.totalWeeks));document.getElementById('imod').classList.remove('show');ld();updMacro();jtt();toast('Data imported');}catch(e){toast('Invalid JSON');}});
+document.getElementById('imp-go').addEventListener('click',()=>{const raw=document.getElementById('imp-ta').value.trim();if(!raw){toast('No data');return;}try{const data=JSON.parse(raw);const km={DT:'d',CK:'ck',SK:'sk',RT:'r',NT:'n',DS:'ds',SV:'sv',OV:'ov',PHASES:'ph',LIB:'lib',SEX:'sex',MEAS:'meas',ACT:'act',CF:'cf',WS:'ws'};Object.keys(km).forEach(k=>{if(data[k]!==undefined)localStorage.setItem('cb42'+km[k],JSON.stringify(data[k]));});if(data.totalWeeks)localStorage.setItem('cb42wk',String(data.totalWeeks));document.getElementById('imod').classList.remove('show');
+function toggleLeg(id){
+  const wrap=document.getElementById(id);
+  const span=document.getElementById(id+'-items');
+  if(!span)return;
+  const vis=span.style.display!=='none'&&span.style.display!=='';
+  span.style.cssText=vis?'display:none':'display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center';
+  const btn=wrap?wrap.querySelector('button'):null;
+  if(btn)btn.textContent=vis?'▸ Key':'▾ Key';
+}
+ld();updMacro();jtt();toast('Data imported');}catch(e){toast('Invalid JSON');}});
 // Settings
 function openSettings(){const sp=document.getElementById('sp');sp.classList.toggle('open');if(sp.classList.contains('open'))showSetMenu();}
 function showSetMenu(){document.getElementById('set-menu').style.display='flex';document.querySelectorAll('.set-panel').forEach(p=>p.classList.remove('open'));}
@@ -600,18 +614,38 @@ function rdrS(){
     cell.addEventListener('click',()=>selDay(o));
     el.appendChild(cell);
   }
-  // Edge-scroll: advance week when user scrolls to edge of ribbon
+  // Snap ribbon to week on release + edge-advance with high threshold to avoid accidental swipe
   const rs=document.querySelector('.rib-s');if(!rs)return;
-  rs.onscroll=null;
+  rs.onscroll=null;rs.onmouseup=null;rs.ontouchend=null;
+  // Snap to current week's Saturday on pointer release
+  const snapToWeek=()=>{
+    const visible=rs.getBoundingClientRect();
+    const cells=rs.querySelectorAll('.dc');
+    let best=null,bestDist=Infinity;
+    cells.forEach(c=>{const r=c.getBoundingClientRect();const cx=r.left+r.width/2;const dist=Math.abs(cx-visible.left);if(dist<bestDist){bestDist=dist;best=c;}});
+    if(best){const o=parseInt(best.dataset.off);const snapSO=o-(o%7);if(snapSO!==SO){SO=Math.max(0,Math.min(TW*7-1,snapSO));CW=o2w(SO);rdrW();rdrS();rdrSA();}}
+  };
+  rs.addEventListener('touchend',()=>setTimeout(snapToWeek,80));
+  // Click-drag to scroll ribbon on desktop
+  let _rsDrag=false,_rsStartX=0,_rsStartSL=0,_rsFadeTimer=null;
+  const showFade=(el)=>{el.classList.add('scrolling');clearTimeout(_rsFadeTimer);_rsFadeTimer=setTimeout(()=>el.classList.remove('scrolling'),600);};
+  rs.addEventListener('mousedown',e=>{_rsDrag=true;_rsStartX=e.pageX;_rsStartSL=rs.scrollLeft;rs.style.cursor='grabbing';rs.style.userSelect='none';showFade(rs);});
+  window.addEventListener('mousemove',e=>{if(!_rsDrag)return;e.preventDefault();const dx=e.pageX-_rsStartX;rs.scrollLeft=_rsStartSL-dx;showFade(rs);});
+  window.addEventListener('mouseup',e=>{if(!_rsDrag)return;_rsDrag=false;rs.style.cursor='';rs.style.userSelect='';snapToWeek();});
+  rs.addEventListener('scroll',()=>showFade(rs));
+  // Also wire week tab strip for click-drag
+  const wts2=document.querySelector('.wts');
+  if(wts2){let _wtDrag=false,_wtStartX=0,_wtStartSL=0;const showFadeWt=()=>{wts2.classList.add('scrolling');clearTimeout(_rsFadeTimer);_rsFadeTimer=setTimeout(()=>wts2.classList.remove('scrolling'),600);};wts2.addEventListener('scroll',()=>showFadeWt());wts2.addEventListener('mousedown',e=>{_wtDrag=true;_wtStartX=e.pageX;_wtStartSL=wts2.scrollLeft;wts2.style.cursor='grabbing';wts2.style.userSelect='none';showFadeWt();});window.addEventListener('mousemove',e=>{if(!_wtDrag)return;e.preventDefault();wts2.scrollLeft=_wtStartSL-(e.pageX-_wtStartX);showFadeWt();});window.addEventListener('mouseup',()=>{if(!_wtDrag)return;_wtDrag=false;wts2.style.cursor='';wts2.style.userSelect='';});}
+  // Edge-advance: only fires after deliberate pause at edge (threshold 4px, debounce 400ms for mobile)
   let _rsTimer=null;
   rs.addEventListener('scroll',()=>{
     clearTimeout(_rsTimer);
     _rsTimer=setTimeout(()=>{
-      const atLeft=rs.scrollLeft<8;
-      const atRight=rs.scrollLeft>rs.scrollWidth-rs.clientWidth-8;
-      if(atLeft&&SO>0){SO=Math.max(0,SO-7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
-      else if(atRight&&SO<TW*7-1){SO=Math.min(TW*7-1,SO+7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
-    },120);
+      const atLeft=rs.scrollLeft<4;
+      const atRight=rs.scrollLeft>rs.scrollWidth-rs.clientWidth-4;
+      if(atLeft&&SO>=7){SO=Math.max(0,SO-7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
+      else if(atRight&&SO<TW*7-7){SO=Math.min(TW*7-1,SO+7);CW=o2w(SO);rdrW();rdrS();rdrSA();}
+    },400);
   });
 }
 function selDay(o){SO=o;CW=o2w(o);if(!isR(o)&&DS[o])CS=DS[o];showLog();rdrW();rdrSel();rdrSA();}
@@ -651,7 +685,8 @@ function rdrSA(){
   const sd=document.createElement('div');sd.className='sdc';sd.id='sd';sd.style.borderLeftColor=SC[CS];sd.textContent=SM[CS].l+' — '+SM[CS].d;wrapper.appendChild(sd);
   const pbw=document.createElement('div');pbw.className='pb';pbw.innerHTML='<div class="pbi c-'+CS.toLowerCase()+'" id="pb" style="width:0%"></div>';wrapper.appendChild(pbw);
   if(isPast){const lkb=document.createElement('div');lkb.className='lkb';lkb.innerHTML='<span style="font-size:12px;color:var(--ts)">'+(lkd?'🔒':'🔓')+' '+fmt(dfo(o))+' — saved</span><div class="lt2"><span class="lto '+(lkd?'lk':'')+'" data-lk="1">🔒 Locked</span><span class="lto '+(!lkd?'ul':'')+'" data-lk="0">🔓 Unlocked</span></div>';lkb.querySelectorAll('.lto').forEach(b=>b.addEventListener('click',()=>{const sl=b.dataset.lk==='1';const k=lk(o,CS);if(sl)UL.delete(k);else UL.add(k);rdrSA();}));wrapper.appendChild(lkb);}
-  const tbl=document.createElement('table');tbl.className='ext';tbl.innerHTML='<thead><tr><th style="width:4%"></th><th style="width:24%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:38%">Flag</th></tr></thead><tbody id="tb"></tbody>';wrapper.appendChild(tbl);
+  const tblWrap=document.createElement('div');tblWrap.style.cssText='overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px';
+  const tbl=document.createElement('table');tbl.className='ext';tbl.style.minWidth='480px';tbl.innerHTML='<thead><tr><th style="width:4%"></th><th style="width:24%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:38%">Flag</th></tr></thead><tbody id="tb"></tbody>';tblWrap.appendChild(tbl);wrapper.appendChild(tblWrap);
   const existingNote=NT['n_'+o]||'';
   const nta=document.createElement('textarea');nta.className='nt';nta.id='nt';nta.placeholder='Session notes…';if(lkd)nta.disabled=true;nta.style.display=existingNote?'block':'none';nta.value=existingNote;wrapper.appendChild(nta);
   if(!lkd){const aeb=document.createElement('button');aeb.className='add-ex';aeb.textContent='+ Add exercise';aeb.addEventListener('click',addExRow);const ntb=document.createElement('button');ntb.className='add-ex';ntb.style.marginTop='0';ntb.textContent='＋ Session note';if(existingNote)ntb.style.display='none';ntb.addEventListener('click',()=>{nta.style.display='block';nta.focus();ntb.style.display='none';});const ar=document.createElement('div');ar.className='ar';const svb=document.createElement('button');svb.className='svb';svb.textContent='Save session';svb.addEventListener('click',saveS);ar.appendChild(svb);ar.appendChild(aeb);ar.appendChild(ntb);wrapper.appendChild(ar);}
@@ -837,17 +872,83 @@ function rdrPC(s,cont){
   const scrollWrap=document.createElement('div');scrollWrap.className='chs';scrollWrap.style.flex='1';scrollWrap.style.overflowX='auto';
   const cid='pc_'+s;const canvas=document.createElement('canvas');canvas.id=cid;
   const minW=Math.max(labels.length*60,300);
-  canvas.setAttribute('width',minW);canvas.setAttribute('height',220);
+  canvas.id=cid;canvas.setAttribute('width',minW);canvas.setAttribute('height',220);
   canvas.style.cssText='height:220px;display:block';
   scrollWrap.appendChild(canvas);
+  // Collapsible legend
+  const legToggle=document.createElement('button');legToggle.style.cssText='font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px;align-self:flex-start;margin-top:2px';legToggle.textContent='▸ Key';
   const legDiv=document.createElement('div');legDiv.style.cssText='width:155px;flex-shrink:0;display:flex;flex-direction:column;gap:5px;padding-top:4px;max-height:220px;overflow-y:auto';
+  let legVisible=false;legDiv.style.display='none';
+  legToggle.addEventListener('click',()=>{legVisible=!legVisible;legDiv.style.display=legVisible?'flex':'none';legToggle.textContent=legVisible?'▾ Key':'▸ Key';});
   datasets.forEach(ds=>{const li=document.createElement('div');li.className='li';li.innerHTML='<div class="ld" style="background:'+ds.borderColor+'"></div><span style="font-size:10px;color:var(--ts)">'+ds.label+'</span>';legDiv.appendChild(li);});
-  chartLegRow.appendChild(scrollWrap);chartLegRow.appendChild(legDiv);
+  const legCol=document.createElement('div');legCol.style.cssText='display:flex;flex-direction:column;align-items:flex-start;gap:4px;flex-shrink:0';
+  legCol.appendChild(legToggle);legCol.appendChild(legDiv);
+  chartLegRow.appendChild(scrollWrap);chartLegRow.appendChild(legCol);
   panel.appendChild(chartLegRow);cont.appendChild(panel);
-  if(CHT[cid]){CHT[cid].destroy();CHT[cid]=null;}
-  const tc=getComputedStyle(document.documentElement).getPropertyValue('--ts').trim()||'#58586a';
-  CHT[cid]=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y!==null?c.parsed.y+' vol':'')}}},scales:{x:{ticks:{font:{size:9},color:tc},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
+  // Use mkC for sticky y-axis — pass scroll wrapper id
+  scrollWrap.id=cid+'_scroll';
+  mkC(cid,cid+'_scroll',datasets,' vol',labels,220);
 }
+
+// ── Unified chart builder with sticky y-axis ─────────────────────────────
+function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
+  if(!window.Chart)return;
+  if(CHT[canvasId]){CHT[canvasId].destroy();CHT[canvasId]=null;}
+  const scroll=document.getElementById(scrollId);if(!scroll)return;
+  const canvas=document.getElementById(canvasId);if(!canvas)return;
+  const tc=getComputedStyle(document.documentElement).getPropertyValue('--ts').trim()||'#58586a';
+  const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
+  const pxPerPt=opts&&opts.pxPerPt?opts.pxPerPt:56;
+  const minW=Math.max(labels.length*pxPerPt,320);
+  const h=height||150;
+
+  // Wrap: sticky y-axis overlay + scrollable chart
+  let wrap=scroll.querySelector('.chs-wrap');
+  if(!wrap){wrap=document.createElement('div');wrap.className='chs-wrap';scroll.appendChild(wrap);}
+  wrap.innerHTML='';
+  const yOvCanvas=document.createElement('canvas');yOvCanvas.className='y-overlay';yOvCanvas.id=canvasId+'_yov';
+  wrap.appendChild(yOvCanvas);
+  wrap.appendChild(canvas);
+
+  // Full-width canvas
+  canvas.setAttribute('width',minW);canvas.setAttribute('height',h);
+  canvas.style.cssText='height:'+h+'px;display:block';
+
+  const yScaleCfg=opts&&opts.yMin!=null
+    ?{suggestedMin:opts.yMin,suggestedMax:opts.yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}
+    :{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:opts&&opts.beginAtZero?true:false};
+
+  // afterDraw plugin — copies y-axis region to sticky overlay canvas
+  const stickyYPlugin={
+    id:'stickyY_'+canvasId,
+    afterDraw(chart){
+      const yScale=chart.scales.y;if(!yScale)return;
+      const ov=document.getElementById(canvasId+'_yov');if(!ov)return;
+      const yW=Math.ceil(yScale.width)+2;const cH=chart.canvas.height;
+      ov.width=yW;ov.height=cH;ov.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
+      const octx=ov.getContext('2d');
+      octx.drawImage(chart.canvas,0,0,yW*window.devicePixelRatio||yW,cH,0,0,yW,cH);
+      // Padding so chart content isn't hidden behind overlay — set scroll padding
+      scroll.style.paddingLeft='0';
+    }
+  };
+
+  CHT[canvasId]=new Chart(canvas,{
+    type:'line',
+    data:{labels,datasets:validDs},
+    plugins:[stickyYPlugin],
+    options:{
+      responsive:false,maintainAspectRatio:false,
+      interaction:{mode:'nearest',intersect:true},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},
+      scales:{
+        x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},
+        y:yScaleCfg
+      }
+    }
+  });
+}
+
 function mkChart(canvasId,scrollId,datasets,yUnit,labels,height){
   if(!window.Chart)return;if(CHT[canvasId]){CHT[canvasId].destroy();CHT[canvasId]=null;}
   const canvas=document.getElementById(canvasId);if(!canvas)return;
@@ -858,7 +959,7 @@ function mkChart(canvasId,scrollId,datasets,yUnit,labels,height){
   canvas.setAttribute('width',minW);canvas.setAttribute('height',h);
   canvas.style.cssText='height:'+h+'px;display:block';
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
 }
 // Measurements
 document.getElementById('mab').addEventListener('click',()=>{const f=document.getElementById('mf2');f.classList.toggle('open');if(f.classList.contains('open')){document.getElementById('mfd').value=fISO(now());bMI();}});
@@ -888,22 +989,21 @@ function rdrMeasCharts(){
     {label:'Lean Mass',data:allDates.map(d=>{const wt=MEAS[d]?.weight;const bf=aBF(MEAS[d]||{});if(wt==null||bf==null)return null;return Math.round((wt*(1-bf/100))*10)/10;}),borderColor:'#10b981',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:2,tension:0.2,spanGaps:true},
     {label:'Fat Mass',data:allDates.map(d=>{const wt=MEAS[d]?.weight;const bf=aBF(MEAS[d]||{});if(wt==null||bf==null)return null;return Math.round((wt*(bf/100))*10)/10;}),borderColor:'#f97316',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:2,tension:0.2,spanGaps:true},
   ];
-  const wtLegEl=document.getElementById('ccl').parentElement?.previousElementSibling;
-  document.getElementById('wl').innerHTML=wtDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('');
-  mkChart('wc','wt-s',wtDs,' kg',labels,160);
+  document.getElementById('wl').innerHTML='<button onclick="toggleLeg(\'wl\')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="wl-items" style="display:none">'+wtDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('')+'</span>';
+  mkC('wc','wt-s',wtDs,' kg',labels,160);
   // Circumference chart — y-axis zoomed to actual data range ±2
   const cDs=CID.map((id,i)=>({label:CLA[i],data:allDates.map(d=>MEAS[d]?.[id]??null),borderColor:CC2[i],backgroundColor:CC2[i]+'1a',borderWidth:2,pointRadius:3,tension:0.2,spanGaps:true})).filter(ds=>ds.data.some(v=>v!==null));
-  document.getElementById('ccl').innerHTML=cDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('');
+  document.getElementById('ccl').innerHTML='<button onclick="toggleLeg(\'ccl\')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="ccl-items" style="display:none">'+cDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('')+'</span>';
   const allCircVals=cDs.flatMap(ds=>ds.data.filter(v=>v!==null));
   const circMin=allCircVals.length?Math.min(...allCircVals):0;
   const circMax=allCircVals.length?Math.max(...allCircVals):100;
-  mkChartZoom('cc','ci-s',cDs,' cm',labels,200,circMin-2,circMax+2);
-  // BF% chart — 36px per point for tighter spacing
+  mkC('cc','ci-s',cDs,' cm',labels,200,{yMin:circMin-2,yMax:circMax+2});
+  // BF% chart — 36px per point
   const bfDates=allDates.filter(d=>d>=DCUT);const bfLabels=bfDates.map(fmtD);
   const BFS=[{label:'Scale',color:'#6366f1',fn:e=>e.bf_scale??null},{label:'Navy',color:'#0ea5e9',fn:e=>nBF(e.waist,e.neck)},{label:'Deurenberg',color:'#10b981',fn:e=>dBF(e.weight)},{label:'Plicometer',color:'#f59e0b',fn:e=>pBF(e)}];
   const bfDs=BFS.map(s=>({label:s.label,data:bfDates.map(d=>s.fn(MEAS[d]||{})??null),borderColor:s.color,backgroundColor:s.color+'1a',borderWidth:2,pointRadius:3,tension:0.2,spanGaps:true})).filter(ds=>ds.data.some(v=>v!==null));
-  document.getElementById('bcl').innerHTML=bfDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('');
-  mkChartBF('bc','bf-s',bfDs,'%',bfLabels,200);
+  document.getElementById('bcl').innerHTML='<button onclick="toggleLeg(\'bcl\')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="bcl-items" style="display:none">'+bfDs.map(ds=>'<div class="li"><div class="ld" style="background:'+ds.borderColor+'"></div><span>'+ds.label+'</span></div>').join('')+'</span>';
+  mkC('bc','bf-s',bfDs,'%',bfLabels,200,{pxPerPt:36});
 }
 // Chart helper with explicit y-axis range (circumference)
 function mkChartZoom(canvasId,scrollId,datasets,yUnit,labels,height,yMin,yMax){
@@ -913,7 +1013,7 @@ function mkChartZoom(canvasId,scrollId,datasets,yUnit,labels,height,yMin,yMax){
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
   const minW=Math.max(labels.length*56,320);const scroll=document.getElementById(scrollId);if(scroll)scroll.style.overflowX='auto';
   const h2=height||200;canvas.setAttribute('width',minW);canvas.setAttribute('height',h2);canvas.style.cssText='height:'+h2+'px;display:block';
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{suggestedMin:yMin,suggestedMax:yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{suggestedMin:yMin,suggestedMax:yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}}});
 }
 // BF% chart — 36px per point
 function mkChartBF(canvasId,scrollId,datasets,yUnit,labels,height){
@@ -923,7 +1023,7 @@ function mkChartBF(canvasId,scrollId,datasets,yUnit,labels,height){
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
   const minW=Math.max(labels.length*36,200);const scroll=document.getElementById(scrollId);if(scroll)scroll.style.overflowX='auto';
   canvas.style.width=minW+'px';canvas.style.height=(height||200)+'px';
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
 }
 function rdrMHT(){
   const table=document.getElementById('mht');table.innerHTML='';const dates=Object.keys(MEAS).sort((a,b)=>a>b?-1:1);
@@ -967,7 +1067,7 @@ function buildCalChart(el){
     {label:'S3 '+SM.S3.d.split(' · ')[0],data:s3d,borderColor:SC.S3,backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:0.3,spanGaps:false},
     {label:'Total',data:totd,borderColor:'#52525b',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:3,tension:0.3,spanGaps:false},
   ];
-  CHT.wjcal=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y?c.parsed.y.toLocaleString()+' kcal':'—')}}},scales:{x:{ticks:{font:{size:9},color:tc},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+' kcal',maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:true}}}});
+  CHT.wjcal=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y?c.parsed.y.toLocaleString()+' kcal':'—')}}},scales:{x:{ticks:{font:{size:9},color:tc},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+' kcal',maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:true}}}});
 }
 function rdrWeek(){
   const el=document.getElementById('wc2');el.innerHTML='';
@@ -977,7 +1077,7 @@ function rdrWeek(){
   const wkStart=w2o(CW);const wkEnd=Math.min(wkStart+6,TW*7-1);
   let wkTotal=0;for(let o=wkStart;o<=wkEnd;o++){const t=gDT(o);if(t&&t.ca)wkTotal+=t.ca;}
   const statTile=document.createElement('div');statTile.style.cssText='display:inline-flex;flex-direction:column;gap:2px;padding:.55rem .85rem;background:color-mix(in srgb,var(--ao) 7%,var(--bg-section));border:1px solid color-mix(in srgb,var(--ao) 20%,var(--b1));border-radius:var(--r1);margin-bottom:.85rem';
-  statTile.innerHTML='<div class="atol">Week W'+CW+' · Active Calories</div><div class="atov">'+(wkTotal>0?wkTotal.toLocaleString()+' kcal':'—')+'</div>';
+  statTile.innerHTML='<div class="atol">🔥 Week W'+CW+' · Active Calories</div><div class="atov">'+(wkTotal>0?wkTotal.toLocaleString()+' kcal':'—')+'</div>';
   el.appendChild(statTile);
   // Calorie chart
   const cw=document.createElement('div');cw.className='wj-cw';
@@ -986,7 +1086,7 @@ function rdrWeek(){
   const tg=document.createElement('div');tg.className='wj-tg';
   ['week','month'].forEach(m=>{const opt=document.createElement('div');opt.className='wj-to'+(wjMode===m?' sel':'');opt.textContent=m.charAt(0).toUpperCase()+m.slice(1);opt.addEventListener('click',()=>{wjMode=m;el.querySelectorAll('.wj-to').forEach((o,i)=>o.classList.toggle('sel',['week','month'][i]===m));buildCalChart(el);});tg.appendChild(opt);});
   tr2.appendChild(tl);tr2.appendChild(tg);
-  const calLeg=document.createElement('div');calLeg.className='pleg';calLeg.innerHTML=['S1','S2','S3'].map(s=>'<div class="li"><div class="ld" style="background:'+SC[s]+'"></div><span>'+s+' '+SM[s].d.split(' · ')[0]+'</span></div>').join('')+'<div class="li"><div class="ld" style="background:#52525b"></div><span>Total</span></div>';
+    const calLeg=document.createElement('div');calLeg.className='pleg';calLeg.id='cal-leg';calLeg.innerHTML='<button onclick="toggleLeg(\'cal-leg\')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="cal-leg-items" style="display:none">'+['S1','S2','S3'].map(s=>'<div class="li"><div class="ld" style="background:'+SC[s]+'"></div><span>'+s+' '+SM[s].d.split(' · ')[0]+'</span></div>').join('')+'<div class="li"><div class="ld" style="background:#52525b"></div><span>Total</span></div></span>';
   const calScroll=document.createElement('div');calScroll.id='wj-cal-scroll';calScroll.className='chs';
   const calCanvas=document.createElement('canvas');calCanvas.id='wj-cal-canvas';calCanvas.style.cssText='height:180px;display:block';calScroll.appendChild(calCanvas);
   cw.appendChild(tr2);cw.appendChild(calLeg);cw.appendChild(calScroll);el.appendChild(cw);
