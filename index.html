@@ -94,15 +94,8 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .vt.act{background:var(--bg-section);color:var(--tx);border-color:var(--b1);font-weight:600}
 /* Ribbon */
 .rib-w{padding:.85rem 1.25rem .55rem;border-bottom:1px solid var(--b0);background:var(--bg-root);display:flex;justify-content:center}
-/* Fixed 7-tile window — no overflow, drag updates SO directly */
-.rib-s{position:relative;overflow:hidden;padding-bottom:2px;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
-.rib-s:active{cursor:grabbing}
-.sg{display:flex;gap:3px;width:max-content;transition:transform .18s cubic-bezier(.25,.46,.45,.94)}
-.sg.dragging{transition:none}
-/* Edge fade — always visible as affordance for draggability */
-.rib-s::before,.rib-s::after{content:'';position:absolute;top:0;bottom:0;width:28px;pointer-events:none;z-index:3;transition:opacity .2s}
-.rib-s::before{left:0;background:linear-gradient(to right,var(--bg-root),transparent)}
-.rib-s::after{right:0;background:linear-gradient(to left,var(--bg-root),transparent)}
+.rib-s{padding-bottom:2px}
+.sg{display:flex;gap:3px;justify-content:center}
 .dc{border-radius:var(--r1);border:1px solid var(--b1);padding:5px 4px 4px;text-align:center;font-size:11px;position:relative;user-select:none;cursor:pointer;transition:border-color .12s,background .12s;width:56px;flex-shrink:0;background:var(--bg-root)}
 .dc:hover:not(.rdc){background:var(--bg-section);border-color:var(--b2)}
 .dc.past{opacity:.38}
@@ -151,6 +144,10 @@ input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-
 .lto.ul{background:var(--er-bg);color:var(--er-tx)}
 /* Exercise table */
 table.ext{width:100%;border-collapse:collapse;font-size:13px}
+.drag-handle{cursor:grab;color:var(--tm);opacity:.35;font-size:14px;padding:0 3px;line-height:1;user-select:none;-webkit-user-select:none;touch-action:none}
+.drag-handle:hover{opacity:.7}
+tr.drag-over{border-top:2px solid var(--ab)}
+tr.dragging-row{opacity:.35}
 table.ext th{text-align:left;font-size:10px;font-weight:600;color:var(--tm);text-transform:uppercase;letter-spacing:.04em;padding:0 4px 7px;border-bottom:1px solid var(--b1)}
 table.ext td{padding:6px 4px;vertical-align:middle;border-bottom:1px solid var(--b0)}
 table.ext tr:last-child td{border-bottom:none}
@@ -406,30 +403,30 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
   <div class="nav-sep"></div>
   <button class="vt" id="vt-prog">Progression</button>
   <button class="vt" id="vt-meas">Measurements</button>
-  <button class="vt" id="vt-week">Week Summary</button>
+  <button class="vt act" id="vt-week">Week Summary</button>
 </div>
 
-<div id="lv">
-  <div class="rib-w"><div class="rib-s" id="rib-s" style="width: 410px;"><div class="sg" id="sg"><div class="dc past ldc" data-off="18"><div class="ddn">Wed</div><div class="ddt">08 Jul</div><div class="dsd" style="color:#0ea5e9;">S2</div></div><div class="dc past rdc" data-off="19"><div class="ddn">Thu</div><div class="ddt">09 Jul</div><div class="dsd" style="color:#c8897a">R</div></div><div class="dc past ldc" data-off="20"><div class="ddn">Fri</div><div class="ddt">10 Jul</div><div class="dsd" style="color:#10b981;">S3</div></div><div class="dc past adc" data-off="21"><div class="ddn">Sat</div><div class="ddt">11 Jul</div><div class="dsd" style="color:#6366f1;">S1</div></div><div class="dc tdc" data-off="22"><div class="ddn">Sun</div><div class="ddt">12 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="23"><div class="ddn">Mon</div><div class="ddt">13 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="24"><div class="ddn">Tue</div><div class="ddt">14 Jul</div><div class="dsd">—</div></div></div></div></div>
+<div id="lv" class="hide">
+  <div class="rib-w"><div class="rib-s" id="rib-s"><div class="sg" id="sg"><div class="dc past adc" data-off="21"><div class="ddn">Sat</div><div class="ddt">11 Jul</div><div class="dsd" style="color:#6366f1;">S1</div></div><div class="dc tdc" data-off="22"><div class="ddn">Sun</div><div class="ddt">12 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="23"><div class="ddn">Mon</div><div class="ddt">13 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="24"><div class="ddn">Tue</div><div class="ddt">14 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="25"><div class="ddn">Wed</div><div class="ddt">15 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="26"><div class="ddn">Thu</div><div class="ddt">16 Jul</div><div class="dsd">—</div></div><div class="dc" data-off="27"><div class="ddn">Fri</div><div class="ddt">17 Jul</div><div class="dsd">—</div></div></div></div></div>
   <div class="wtw"><div class="wts" id="wt"><button class="wb" style="border-color: rgb(16, 185, 129);">W1</button><button class="wb" style="border-color: rgb(16, 185, 129);">W2</button><button class="wb" style="border-color: rgb(14, 165, 233);">W3</button><button class="wb aw" style="border-color: rgb(14, 165, 233); background: rgba(14, 165, 233, 0.094); color: rgb(14, 165, 233); border-width: 2px;">W4</button><button class="wb" style="border-color: rgb(236, 72, 153);">W5</button><button class="wb" style="border-color: rgb(139, 92, 246);">W6</button><button class="wb" style="border-color: rgb(239, 68, 68);">W7</button><button class="wb" style="border-color: rgb(16, 185, 129);">W8</button><button class="wb" style="border-color: rgb(16, 185, 129);">W9</button><button class="wb" style="border-color: rgb(16, 185, 129);">W10</button><button class="wb" style="border-color: rgb(16, 185, 129);">W11</button><button class="wb" style="border-color: rgb(16, 185, 129);">W12</button></div></div>
-  <div id="sa"><div class="sess-a"><div class="shr"><div class="stbs" id="st"><button class="stb s1 act">S1</button><button class="stb s2">S2</button><button class="stb s3">S3</button><button class="stb s4">S4</button></div><div class="cal-badge hidden" id="cal-badge">🔥 <span class="cv" id="dca">—</span> active · <span class="cv" id="dct">—</span> total</div></div><div class="sdc" id="sd" style="border-left-color: rgb(99, 102, 241);">Session 1 — Chest · Shoulders · Triceps</div><div class="pb"><div class="pbi c-s1" id="pb" style="width:0%"></div></div><div style="overflow-x: auto; margin: 0px -2px;"><table class="ext" style="min-width: 480px;"><thead><tr><th style="width:4%"></th><th style="width:24%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:38%">Flag</th></tr></thead><tbody id="tb"><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Single Arm DB Bench Press</div><button class="pb2" data-idx="0">✎</button></div><div class="et">DB — alternate sides</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="0" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="s_arm_db_bench" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="36" style="opacity:.6;" data-eid="s_arm_db_bench" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Arnold Press</div><button class="pb2" data-idx="1">✎</button></div><div class="et">DB, seated</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="1" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="arnold_press" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="14" style="opacity:.6;" data-eid="arnold_press" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">DB Lateral Raise</div><button class="pb2" data-idx="2">✎</button></div><div class="et">DB, controlled eccentric</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="2" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="8" style="opacity:.6;" data-eid="db_lat_raise" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="10" style="opacity:.6;" data-eid="db_lat_raise" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Face Pulls</div><button class="pb2" data-idx="3">✎</button></div><div class="et">Band</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="3" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="8" style="opacity:.6;" data-eid="face_pulls" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="102" style="opacity:.6;" data-eid="face_pulls" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">KB Skull Crusher</div><button class="pb2" data-idx="4">✎</button></div><div class="et">KB, lying</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="4" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="kb_skull_crush" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="16" style="opacity:.6;" data-eid="kb_skull_crush" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">KB Tricep Extension</div><button class="pb2" data-idx="5">✎</button></div><div class="et">KB</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="5" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="kb_tricep_ext" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="68" style="opacity:.6;" data-eid="kb_tricep_ext" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">DB Pullover</div><button class="pb2" data-idx="6">✎</button></div><div class="et">DB, lat/serratus</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="6" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="db_pullover" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="16" style="opacity:.6;" data-eid="db_pullover" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">BW Push-ups</div><button class="pb2" data-idx="7">✎</button></div><div class="et">Bodyweight</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="7" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="bw_pushups" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="" style="opacity:.6;" data-eid="bw_pushups" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr></tbody></table></div><textarea class="nt" id="nt" placeholder="Session notes…" style="display: none;"></textarea><div class="ar"><button class="svb">Save session</button><button class="add-ex">+ Add exercise</button><button class="add-ex" style="margin-top: 0px;">＋ Session note</button></div></div><div class="sdiv"></div><div class="act-w"><div class="ahdr"><span class="ahdr-l">⌚ Activity · Apple Watch</span><button class="add-ac">+ Add</button></div><div class="acs"></div></div></div>
+  <div id="sa"><div class="sess-a"><div class="shr"><div class="stbs" id="st"><button class="stb s1">S1</button><button class="stb s2">S2</button><button class="stb s3 act">S3</button><button class="stb s4">S4</button></div><div class="cal-badge hidden" id="cal-badge">🔥 <span class="cv" id="dca">—</span> active · <span class="cv" id="dct">—</span> total</div></div><div class="sdc" id="sd" style="border-left-color: rgb(16, 185, 129);">Session 3 — Lower Body</div><div class="pb"><div class="pbi c-s3" id="pb" style="width:0%"></div></div><div style="overflow-x: auto; margin: 0px -2px;"><table class="ext" style="min-width: 520px;"><thead><tr><th style="width:3%"></th><th style="width:4%"></th><th style="width:23%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:36%">Flag</th></tr></thead><tbody id="tb"><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">KB Goblet Squat</div><button class="pb2" data-idx="0">✎</button></div><div class="et">KB, full depth</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="0" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="13" style="opacity:.6;" data-eid="kb_goblet_sq" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="16" style="opacity:.6;" data-eid="kb_goblet_sq" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">BD Hip Thrusts</div><button class="pb2" data-idx="1">✎</button></div><div class="et">Band, back on bench</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="1" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="14" style="opacity:.6;" data-eid="bd_hip_thrust" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="23" style="opacity:.6;" data-eid="bd_hip_thrust" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Bulgarian Split Squat</div><button class="pb2" data-idx="2">✎</button></div><div class="et">Rear foot elevated</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="2" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="9" style="opacity:.6;" data-eid="bulg_split" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="10" style="opacity:.6;" data-eid="bulg_split" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">KB Sumo Deadlift</div><button class="pb2" data-idx="3">✎</button></div><div class="et">KB, wide stance</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="3" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="14" style="opacity:.6;" data-eid="kb_sumo_dl" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="16" style="opacity:.6;" data-eid="kb_sumo_dl" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">BW Nordic Curl</div><button class="pb2" data-idx="4">✎</button></div><div class="et">Bodyweight, eccentric</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="4" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="9" style="opacity:.6;" data-eid="bw_nordic_curl" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="" style="opacity:.6;" data-eid="bw_nordic_curl" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">DB Stiff Leg Deadlift</div><button class="pb2" data-idx="5">✎</button></div><div class="et">DB, hamstring stretch</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="5" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="12" style="opacity:.6;" data-eid="db_stiff_dl" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="32" style="opacity:.6;" data-eid="db_stiff_dl" data-f="w" placeholder="—"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Back Extensions</div><button class="pb2" data-idx="6">✎</button></div><div class="et">Bodyweight / weighted</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="6" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="10" style="opacity:.6;" data-eid="back_ext" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="" style="opacity:.6;" data-eid="back_ext" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Plank (S3)</div><button class="pb2" data-idx="7">✎</button></div><div class="et">Bodyweight, timed</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="7" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="70" style="opacity:.6;" data-eid="plank_s3" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="" style="opacity:.6;" data-eid="plank_s3" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr><tr class=""><td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td><td style="width:4%"><button class="ck"></button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">Dead Bug (S3)</div><button class="pb2" data-idx="8">✎</button></div><div class="et">Bodyweight / weighted</div><div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb" style="opacity:.38;color:var(--tm)">⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="3" data-idx="8" data-field="sets" placeholder="3"></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="26" style="opacity:.6;" data-eid="dead_bug_s3" data-f="r" placeholder="—"></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="" style="opacity:.6;" data-eid="dead_bug_s3" data-f="w" placeholder="BW"></td><td style="width:38%"><div class="flags"><span class="fl fn">prev</span></div></td></tr></tbody></table></div><textarea class="nt" id="nt" placeholder="Session notes…" style="display: none;"></textarea><div class="ar"><button class="svb">Save session</button><button class="add-ex">+ Add exercise</button><button class="add-ex" style="margin-top: 0px;">＋ Session note</button></div></div><div class="sdiv"></div><div class="act-w"><div class="ahdr"><span class="ahdr-l">⌚ Activity · Apple Watch</span><button class="add-ac">+ Add</button></div><div class="acs"></div></div></div>
 </div>
 
-<div id="pv"><div class="vp">
-  <div class="ps" id="ps"></div>
-  <div id="prog-charts"></div>
+<div id="pv" class=""><div class="vp">
+  <div class="ps" id="ps"><button class="psb s1 act">S1</button><button class="psb s2">S2</button><button class="psb s3">S3</button><button class="psb s4">S4</button></div>
+  <div id="prog-charts"><div class="pcw" style="margin-bottom: 0.85rem;"><div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;"><div class="pct" style="color: rgb(99, 102, 241);">Session 1 — Chest · Shoulders · Triceps</div><div style="font-size: 10px; color: var(--tm); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;">Volume = sets × reps × kg</div></div><div style="display: flex; align-items: flex-start; gap: 12px;"><div class="chs" id="pc_S1_scroll" style="flex: 1 1 0%; overflow-x: auto;"><div class="chs-wrap"><canvas class="y-overlay" id="pc_S1_yov" width="102" height="440" style="position: absolute; top: 0px; left: 0px; pointer-events: none; z-index: 2; height: 220px; width: 51px; background: var(--bg-section);"></canvas><canvas id="pc_S1" width="640" height="440" style="height: 220px; display: block; box-sizing: border-box;"></canvas></div></div><div style="display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex-shrink: 0;"><button style="font-size: 10px; background: none; border: medium; cursor: pointer; color: var(--tm); padding: 2px 4px; border-radius: 3px; align-self: flex-start; margin-top: 2px;">▸ Key</button><div style="width: 155px; flex-shrink: 0; display: none; flex-direction: column; gap: 5px; padding-top: 4px; max-height: 220px; overflow-y: auto;"><div class="li"><div class="ld" style="background:#6366f1"></div><span style="font-size:10px;color:var(--ts)">DB Lateral Raise</span></div><div class="li"><div class="ld" style="background:#0ea5e9"></div><span style="font-size:10px;color:var(--ts)">Face Pulls</span></div><div class="li"><div class="ld" style="background:#10b981"></div><span style="font-size:10px;color:var(--ts)">KB Skull Crusher</span></div><div class="li"><div class="ld" style="background:#f59e0b"></div><span style="font-size:10px;color:var(--ts)">KB Tricep Extension</span></div><div class="li"><div class="ld" style="background:#ec4899"></div><span style="font-size:10px;color:var(--ts)">DB Pullover</span></div><div class="li"><div class="ld" style="background:#ef4444"></div><span style="font-size:10px;color:var(--ts)">Single Arm DB Bench Press</span></div><div class="li"><div class="ld" style="background:#14b8a6"></div><span style="font-size:10px;color:var(--ts)">Arnold Press</span></div><div class="li"><div class="ld" style="background:#f97316"></div><span style="font-size:10px;color:var(--ts)">Cycling</span></div></div></div></div></div></div>
 </div></div>
 
-<div id="mv"><div class="vp">
+<div id="mv" class=""><div class="vp">
   <div class="mh"><span style="font-size:11px;font-weight:700;color:var(--tm);text-transform:uppercase;letter-spacing:.06em">Body Measurements</span><button class="ibtn" id="mab">+ Log</button></div>
-  <div class="bfgt" id="bfgt"></div>
+  <div class="bfgt" id="bfgt"><div class="bfgt-t"><span>BF% journey to 17%</span><span style="font-size:10px;font-weight:700;padding:2px 9px;border-radius:20px;background:var(--in-bg);color:var(--in-tx);border:1px solid var(--in-bd)">36% complete</span></div><div class="bfgt-bw" id="bfgw"><div class="bfgt-f" style="width:36%"></div><div class="bfgt-m" style="left: 57.142857%;"></div><div class="bfgt-m" style="left: 71.428571%;"></div><div class="bfgt-m" style="left: 85.714286%;"></div><div class="bfgt-cm" style="left: 35.714286%;"></div></div><div class="bfgt-ml" id="bfgml"><div class="bfgt-mll" style="left: 57.142857%;">20%</div><div class="bfgt-mll" style="left: 71.428571%;">19%</div><div class="bfgt-mll" style="left: 85.714286%;">18%</div></div><div class="bfgt-ls"><span>24% (start)</span><span>17% (goal)</span></div><div class="bfgt-st"><div><div class="bfgt-sl">Current</div><div class="bfgt-sv">21.5%</div></div><div><div class="bfgt-sl">Change</div><div class="bfgt-sv" style="color:var(--ok-tx)">−2.5%</div></div><div><div class="bfgt-sl">Next milestone</div><div class="bfgt-sv">20% <span style="font-size:11px;color:var(--tm);font-weight:400">(1.5% to go)</span></div></div></div></div>
   <div class="bfc">
-    <div class="bfcard"><div class="bfp" id="bfsp">—</div><div class="bfl">BF% Scale</div><div class="bfd" id="bfsd">—</div><div class="bfch" id="bfsc"></div></div>
-    <div class="bfcard"><div class="bfp" id="bfpp">—</div><div class="bfl">BF% Plicometer</div><div class="bfd" id="bfpd">—</div><div class="bfch" id="bfpc"></div></div>
+    <div class="bfcard"><div class="bfp" id="bfsp">21.3%</div><div class="bfl">BF% Scale</div><div class="bfd" id="bfsd">10 Jul '26</div><div class="bfch neg" id="bfsc">-0.1% vs prev</div></div>
+    <div class="bfcard"><div class="bfp" id="bfpp">9%</div><div class="bfl">BF% Plicometer</div><div class="bfd" id="bfpd">10 Jul '26</div><div class="bfch neg" id="bfpc">-0.1% vs prev</div></div>
     <div class="bf-vd"></div>
-    <div class="bfcard"><div class="bfp" id="bfnp">—</div><div class="bfl">BF% Navy</div><div class="bfd" id="bfnd">—</div><div class="bfch" id="bfnc"></div></div>
-    <div class="bfcard"><div class="bfp" id="bfdp">—</div><div class="bfl">BF% Deurenberg</div><div class="bfd" id="bfdd">—</div><div class="bfch" id="bfdc"></div></div>
-    <div class="bfcard avg"><div class="bfp" id="bfap">—</div><div class="bfl">Average (N·D)</div><div class="bfd" id="bfad">—</div><div class="bfch" id="bfac"></div></div>
+    <div class="bfcard"><div class="bfp" id="bfnp">17.4%</div><div class="bfl">BF% Navy</div><div class="bfd" id="bfnd">10 Jul '26</div><div class="bfch neg" id="bfnc">0% vs prev</div></div>
+    <div class="bfcard"><div class="bfp" id="bfdp">25.7%</div><div class="bfl">BF% Deurenberg</div><div class="bfd" id="bfdd">10 Jul '26</div><div class="bfch neg" id="bfdc">-0.1% vs prev</div></div>
+    <div class="bfcard avg"><div class="bfp" id="bfap">21.5%</div><div class="bfl">Average (N·D)</div><div class="bfd" id="bfad">10 Jul '26</div><div class="bfch neg" id="bfac">-0.1% vs prev</div></div>
   </div>
   <div class="msep"></div>
   <div class="mf2" id="mf2">
@@ -441,14 +438,40 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
     <button class="msb2" id="msb2">Save</button>
   </div>
   <div class="msep"></div>
-  <div class="mhw"><table class="mht" id="mht"></table></div>
+  <div class="mhw"><table class="mht" id="mht"><thead><tr><th class="rl">Measurement</th><th class="">10 Jul '26</th><th class="">3 Jul '26</th><th class="">29 Jun '26</th><th class="">22 Jun '26</th><th class="">18 May '26</th><th class="">21 Apr '26</th><th class="">10 Apr '26</th><th class="">3 Apr '26</th><th class="">27 Mar '26</th><th class="">20 Mar '26</th><th class="">13 Mar '26</th><th class="">6 Mar '26</th><th class="">19 Feb '26</th><th class="">12 Feb '26</th><th style="width:30px"></th></tr></thead><tbody><tr><td class="rl">Biceps R/Flex <span class="ru">cm</span></td><td>37</td><td>37.5</td><td>37.5</td><td>—</td><td>—</td><td>37.5</td><td>37.5</td><td>37.5</td><td>37.5</td><td>38.5</td><td>38</td><td>37.5</td><td>37</td><td>36.5</td><td></td></tr><tr><td class="rl">Chest <span class="ru">cm</span></td><td>99.5</td><td>98</td><td>98.5</td><td>—</td><td>—</td><td>98.5</td><td>100</td><td>99.5</td><td>100</td><td>101</td><td>101.5</td><td>102.5</td><td>102.5</td><td>102.5</td><td></td></tr><tr><td class="rl">Forearm R/Flex <span class="ru">cm</span></td><td>30.5</td><td>31</td><td>31</td><td>—</td><td>—</td><td>30</td><td>30.5</td><td>30.5</td><td>30.5</td><td>30.5</td><td>30.5</td><td>30.5</td><td>30.5</td><td>30.5</td><td></td></tr><tr><td class="rl">Belly button <span class="ru">cm</span></td><td>87</td><td>87</td><td>87</td><td>—</td><td>—</td><td>85.5</td><td>86</td><td>86</td><td>87</td><td>87</td><td>88</td><td>89.5</td><td>92</td><td>92</td><td></td></tr><tr><td class="rl">Waist <span class="ru">cm</span></td><td>86</td><td>86</td><td>87</td><td>—</td><td>—</td><td>85.5</td><td>85.5</td><td>86</td><td>86</td><td>86</td><td>86.5</td><td>87.5</td><td>89.5</td><td>89.5</td><td></td></tr><tr><td class="rl">Shoulders <span class="ru">cm</span></td><td>115.5</td><td>117</td><td>115.5</td><td>—</td><td>—</td><td>113.5</td><td>117.5</td><td>116.5</td><td>116.5</td><td>116.5</td><td>116.5</td><td>118</td><td>119</td><td>119</td><td></td></tr><tr><td class="rl">Butt <span class="ru">cm</span></td><td>97</td><td>97</td><td>97.3</td><td>—</td><td>—</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td>96.5</td><td></td></tr><tr><td class="rl">Thigh R <span class="ru">cm</span></td><td>58.5</td><td>57.8</td><td>57</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td></td></tr><tr><td class="rl">Neck <span class="ru">cm</span></td><td>39.5</td><td>39.5</td><td>39.5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td></td></tr><tr><td class="rl">Weight <span class="ru">kg</span></td><td>75.9</td><td>76.3</td><td>76.5</td><td>77.05</td><td>75.65</td><td>74.6</td><td>75.5</td><td>75.5</td><td>75.5</td><td>75.5</td><td>75.8</td><td>75.9</td><td>76.2</td><td>77.1</td><td></td></tr><tr><td class="rl">BF% Scale <span class="ru">%</span></td><td>21.3</td><td>21.4</td><td>21.6</td><td>21.8</td><td>21.2</td><td>20.6</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>21.5</td><td></td></tr><tr><td class="rl">Chest skinfold <span class="ru">mm</span></td><td>14</td><td>14</td><td>14</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td></td></tr><tr><td class="rl">Tricep skinfold <span class="ru">mm</span></td><td>4.5</td><td>5</td><td>5</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td></td></tr><tr><td class="rl">Thigh skinfold <span class="ru">mm</span></td><td>6</td><td>6</td><td>6</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td></td></tr><tr><td class="rl bfr">BF% Navy</td><td class="bfr">17.4%</td><td class="bfr">17.4%</td><td class="bfr">18.2%</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td></td></tr><tr><td class="rl bfr">BF% Deurenberg</td><td class="bfr">25.7%</td><td class="bfr">25.8%</td><td class="bfr">25.9%</td><td class="bfr">26.1%</td><td class="bfr">25.6%</td><td class="bfr">25.1%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.6%</td><td class="bfr">25.7%</td><td class="bfr">25.8%</td><td class="bfr">26.2%</td><td></td></tr><tr><td class="rl bfr">BF% Plicometer</td><td class="bfr">9%</td><td class="bfr">9.1%</td><td class="bfr">9.1%</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td class="bfr">—</td><td></td></tr><tr class="avgr"><td class="rl bfr">Average BF% (N·D)</td><td class="bfr">21.5%</td><td class="bfr">21.6%</td><td class="bfr">22%</td><td class="bfr">26.1%</td><td class="bfr">25.6%</td><td class="bfr">25.1%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.5%</td><td class="bfr">25.6%</td><td class="bfr">25.7%</td><td class="bfr">25.8%</td><td class="bfr">26.2%</td><td></td></tr><tr><td class="rl bfr">Fat Mass (kg)<div style="font-size:9px;color:var(--tm);font-weight:400;margin-top:2px">weight × BF% avg</div></td><td class="bfr">16.3</td><td class="bfr">16.5</td><td class="bfr">16.8</td><td class="bfr">20.1</td><td class="bfr">19.4</td><td class="bfr">18.7</td><td class="bfr">19.3</td><td class="bfr">19.3</td><td class="bfr">19.3</td><td class="bfr">19.3</td><td class="bfr">19.4</td><td class="bfr">19.5</td><td class="bfr">19.7</td><td class="bfr">20.2</td><td></td></tr><tr><td class="rl bfr">Lean Mass (kg)<div style="font-size:9px;color:var(--tm);font-weight:400;margin-top:2px">weight × (1 − BF% avg)</div></td><td class="bfr">59.6</td><td class="bfr">59.8</td><td class="bfr">59.7</td><td class="bfr">56.9</td><td class="bfr">56.3</td><td class="bfr">55.9</td><td class="bfr">56.2</td><td class="bfr">56.2</td><td class="bfr">56.2</td><td class="bfr">56.2</td><td class="bfr">56.4</td><td class="bfr">56.4</td><td class="bfr">56.5</td><td class="bfr">56.9</td><td></td></tr><tr><td></td><td class="dc2"><button onclick="delMeas('2026-07-10')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-07-03')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-06-29')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-06-22')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-05-18')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-04-21')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-04-10')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-04-03')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-03-27')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-03-20')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-03-13')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-03-06')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-02-19')">✕</button></td><td class="dc2"><button onclick="delMeas('2026-02-12')">✕</button></td><td></td></tr></tbody></table></div>
   <div class="msep"></div>
-  <div class="cw"><div class="ct">Weight · Lean Mass · Fat Mass (kg)</div><div class="cl" id="wl"></div><div class="chs" id="wt-s"><canvas id="wc" style="height:160px;display:block"></canvas></div></div>
-  <div class="cw"><div class="ct">Circumference (cm)</div><div class="cl" id="ccl"></div><div class="chs" id="ci-s"><canvas id="cc" style="height:200px;display:block"></canvas></div></div>
-  <div class="cw"><div class="ct">Body fat % trend</div><div class="cl" id="bcl"></div><div class="chs" id="bf-s"><canvas id="bc" style="height:200px;display:block"></canvas></div></div>
+  <div class="cw"><div class="ct">Weight · Lean Mass · Fat Mass (kg)</div><div class="cl" id="wl"><button onclick="toggleLeg('wl')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="wl-items" style="display:none"><div class="li"><div class="ld" style="background:#2a78d6"></div><span>Weight</span></div><div class="li"><div class="ld" style="background:#10b981"></div><span>Lean Mass</span></div><div class="li"><div class="ld" style="background:#f97316"></div><span>Fat Mass</span></div></span></div><div class="chs" id="wt-s"><div class="chs-wrap"><canvas class="y-overlay" id="wc_yov" width="78" height="320" style="position: absolute; top: 0px; left: 0px; pointer-events: none; z-index: 2; height: 160px; width: 39px; background: var(--bg-section);"></canvas><canvas id="wc" style="height: 160px; display: block; box-sizing: border-box;" width="1568" height="320"></canvas></div></div></div>
+  <div class="cw"><div class="ct">Circumference (cm)</div><div class="cl" id="ccl"><button onclick="toggleLeg('ccl')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="ccl-items" style="display:none"><div class="li"><div class="ld" style="background:#2a78d6"></div><span>Biceps</span></div><div class="li"><div class="ld" style="background:#1baf7a"></div><span>Chest</span></div><div class="li"><div class="ld" style="background:#eda100"></div><span>Forearm</span></div><div class="li"><div class="ld" style="background:#4a3aa7"></div><span>Belly button</span></div><div class="li"><div class="ld" style="background:#e34948"></div><span>Waist</span></div><div class="li"><div class="ld" style="background:#e87ba4"></div><span>Neck</span></div></span></div><div class="chs" id="ci-s"><div class="chs-wrap"><canvas class="y-overlay" id="cc_yov" width="94" height="400" style="position: absolute; top: 0px; left: 0px; pointer-events: none; z-index: 2; height: 200px; width: 47px; background: var(--bg-section);"></canvas><canvas id="cc" style="height: 200px; display: block; box-sizing: border-box;" width="1568" height="400"></canvas></div></div></div>
+  <div class="cw"><div class="ct">Body fat % trend</div><div class="cl" id="bcl"><button onclick="toggleLeg('bcl')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="bcl-items" style="display:none"><div class="li"><div class="ld" style="background:#6366f1"></div><span>Scale</span></div><div class="li"><div class="ld" style="background:#0ea5e9"></div><span>Navy</span></div><div class="li"><div class="ld" style="background:#10b981"></div><span>Deurenberg</span></div><div class="li"><div class="ld" style="background:#f59e0b"></div><span>Plicometer</span></div></span></div><div class="chs" id="bf-s"><div class="chs-wrap"><canvas class="y-overlay" id="bc_yov" width="72" height="400" style="position: absolute; top: 0px; left: 0px; pointer-events: none; z-index: 2; height: 200px; width: 36px; background: var(--bg-section);"></canvas><canvas id="bc" style="height: 200px; display: block; box-sizing: border-box;" width="640" height="400"></canvas></div></div></div>
 </div></div>
 
-<div id="wv"><div class="vp" id="wc2"></div></div>
+<div id="wv" class="open"><div class="vp" id="wc2"><div class="wj-tw">Week Summary Journal</div><div style="display: inline-flex; flex-direction: column; gap: 2px; padding: 0.55rem 0.85rem; background: color-mix(in srgb,var(--ao) 7%,var(--bg-section)); border: 1px solid color-mix(in srgb,var(--ao) 20%,var(--b1)); border-radius: var(--r1); margin-bottom: 0.85rem;"><div class="atol">🔥 Week W4 · Active Calories</div><div class="atov">—</div></div><div class="wj-cw"><div class="wj-tr"><div class="wj-tl">Calorie burn by session type</div><div class="wj-tg"><div class="wj-to sel">Week</div><div class="wj-to">Month</div></div></div><div class="pleg" id="cal-leg"><button onclick="toggleLeg('cal-leg')" style="font-size:10px;background:transparent;border:none;cursor:pointer;color:var(--tm);padding:2px 4px;border-radius:3px">▸ Key</button><span id="cal-leg-items" style="display:none"><div class="li"><div class="ld" style="background:#6366f1"></div><span>S1 Chest</span></div><div class="li"><div class="ld" style="background:#0ea5e9"></div><span>S2 Back</span></div><div class="li"><div class="ld" style="background:#10b981"></div><span>S3 Lower Body</span></div><div class="li"><div class="ld" style="background:#52525b"></div><span>Total</span></div></span></div><div id="wj-cal-scroll" class="chs" style="overflow-x: auto;"><canvas id="wj-cal-canvas" width="600" height="360" style="height: 180px; display: block; box-sizing: border-box;"></canvas></div></div><div class="wj-compose"><div class="wj-ch"><div class="wj-cl">New entry — Week</div><select class="wj-ws"><option value="1">W1</option><option value="2">W2</option><option value="3">W3</option><option value="4">W4 (current)</option><option value="5">W5</option><option value="6">W6</option><option value="7">W7</option><option value="8">W8</option><option value="9">W9</option><option value="10">W10</option><option value="11">W11</option><option value="12">W12</option></select></div><div class="wj-ce" contenteditable="true" data-placeholder="Paste or write your week summary — tables paste with formatting preserved…"></div><button class="wj-sv">Save entry</button></div><div style="height: 1px; background: var(--b1); opacity: 0.4; margin-bottom: 1.5rem;"></div><div class="wj-entries"><div><div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 0.4rem;"><div class="wj-eh" style="margin: 0px;">10 Jul 2026 · W3 · Cut B1 · 2000 kcal · 185P / 70F / 185C</div><button style="font-size: 10px; padding: 2px 9px; border-radius: 20px; border: 1px solid var(--b1); background: none; color: var(--ts); cursor: pointer; flex-shrink: 0; font-weight: 500;">Edit</button></div><div class="wj-eb"><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">You're not ending maintenance, you're five days into Cut B.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><strong>Where you are: Cut B, Week 1</strong></p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Weight: 75.9 kg, already down from 76.3 last week. The deficit is biting immediately — that's 400g in five days. Some water, some real.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Body fat: 21.5% estimated, 36% of the way to your 17% goal.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><strong>What the numbers say after five days of cutting:</strong></p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">The scale responded fast — no plateau, no lag. Your body was primed from three weeks of consistent maintenance and went straight into fat-burning mode.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Tricep caliper dropped from 5mm to 4.5mm — genuine subcutaneous fat loss already measurable on an honest site. That's a strong early signal.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Belly and waist holding at 87 and 86. These won't move much in week one — expect to see them start dropping from week 2–3.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Chest at 99.5 is likely a temporary fluctuation from glycogen and water redistribution as your body adjusts to lower carbs. Your true chest is still around 98–98.5. This will settle.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Upper body measurements (biceps 37, forearm 30.5, shoulders 115.5) dipped slightly — consistent with early glycogen depletion from dropping to 170g carbs. They'll stabilise once your body adapts.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><strong>Where you stand relative to your goals:</strong></p><div class="overflow-x-auto w-full px-2 mb-6" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><table class="min-w-full border-collapse text-sm leading-[1.7] whitespace-normal"><thead class="text-left"><tr><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Metric</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Start (Feb)</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Cut B Start (Jul 5)</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Now (Jul 10)</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Goal</th></tr></thead><tbody><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Weight</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">77.4</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~76.3</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">75.9</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">71–73</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Est. BF</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">24%</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">21.5%</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">21.5%</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">17–18%</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Chest</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">102.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">98.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~98.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">95–96</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Belly</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">92.0</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">87.0</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">87.0</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">82–83</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Hips</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">89.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">86.0</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">86.0</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">82–83</td></tr></tbody></table></div><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><strong>What needs to happen over the next 7 weeks:</strong></p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Lose 3–4 kg of fat. Drop chest by 3 cm. Drop belly and hips by 4 cm each. Maintain lean mass at ~59 kg.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><strong>Revised milestones from your actual July 5 start:</strong></p><div class="overflow-x-auto w-full px-2 mb-6" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);"><table class="min-w-full border-collapse text-sm leading-[1.7] whitespace-normal"><thead class="text-left"><tr><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Week</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Date</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Weight</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Chest</th><th scope="col" class="text-text-100 border-b-0.5 border-[hsl(var(--border-300)/0.6)] py-2 pr-4 align-top font-bold">Belly</th></tr></thead><tbody><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">1 (done)</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Jul 10</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">75.9 ✓</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~98.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">87</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">2</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Jul 17</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~75.0–75.5</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">98</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">86</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">4 (checkpoint)</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Jul 31</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~73.5–74</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">97</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">84–85</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">6</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Aug 14</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~72–73</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">96</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">83–84</td></tr><tr><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">8 (goal)</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">Aug 28</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">~71–72</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">95–96</td><td class="border-b-0.5 border-[hsl(var(--border-300)/0.3)] py-2 pr-4 align-top">82–83</td></tr></tbody></table></div><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Decision point: July 31. That's where you honestly assess whether to push through to week 8 or stop at week 6.</p><p class="font-claude-response-body break-words whitespace-normal" style="caret-color: rgb(0, 0, 0); color: rgb(0, 0, 0);">Week 1 is done and the data is clean. You're on track.</p></div><div class="wj-es"></div></div><div><div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 0.4rem;"><div class="wj-eh" style="margin: 0px;">10 Jul 2026 · W3 · Cut B1 · 2000 kcal · 185P / 70F / 185C</div><button style="font-size: 10px; padding: 2px 9px; border-radius: 20px; border: 1px solid var(--b1); background: none; color: var(--ts); cursor: pointer; flex-shrink: 0; font-weight: 500;">Edit</button></div><div class="wj-eb" style="white-space: pre-wrap;">You're not ending maintenance, you're five days into Cut B.
+Where you are: Cut B, Week 1
+Weight: 75.9 kg, already down from 76.3 last week. The deficit is biting immediately — that's 400g in five days. Some water, some real.
+Body fat: 21.5% estimated, 36% of the way to your 17% goal.
+What the numbers say after five days of cutting:
+The scale responded fast — no plateau, no lag. Your body was primed from three weeks of consistent maintenance and went straight into fat-burning mode.
+Tricep caliper dropped from 5mm to 4.5mm — genuine subcutaneous fat loss already measurable on an honest site. That's a strong early signal.
+Belly and waist holding at 87 and 86. These won't move much in week one — expect to see them start dropping from week 2–3.
+Chest at 99.5 is likely a temporary fluctuation from glycogen and water redistribution as your body adjusts to lower carbs. Your true chest is still around 98–98.5. This will settle.
+Upper body measurements (biceps 37, forearm 30.5, shoulders 115.5) dipped slightly — consistent with early glycogen depletion from dropping to 170g carbs. They'll stabilise once your body adapts.
+Where you stand relative to your goals:
+MetricStart (Feb)Cut B Start (Jul 5)Now (Jul 10)GoalWeight77.4~76.375.971–73Est. BF24%21.5%21.5%17–18%Chest102.598.5~98.595–96Belly92.087.087.082–83Hips89.586.086.082–83
+What needs to happen over the next 7 weeks:
+Lose 3–4 kg of fat. Drop chest by 3 cm. Drop belly and hips by 4 cm each. Maintain lean mass at ~59 kg.
+Revised milestones from your actual July 5 start:
+WeekDateWeightChestBelly1 (done)Jul 1075.9 ✓~98.5872Jul 17~75.0–75.598864 (checkpoint)Jul 31~73.5–749784–856Aug 14~72–739683–848 (goal)Aug 28~71–7295–9682–83
+Decision point: July 31. That's where you honestly assess whether to push through to week 8 or stop at week 6.
+Week 1 is done and the data is clean. You're on track.</div><div class="wj-es"></div></div><div><div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 0.4rem;"><div class="wj-eh" style="margin: 0px;">05 Jul 2026 · W2 · Maintenance · 2400 kcal · 160P / 80F / 260C</div><button style="font-size: 10px; padding: 2px 9px; border-radius: 20px; border: 1px solid var(--b1); background: none; color: var(--ts); cursor: pointer; flex-shrink: 0; font-weight: 500;">Edit</button></div><div class="wj-eb" style="white-space: pre-wrap;">This is a really clean week of data. Everything is moving in the right direction — at maintenance, which is exactly what you want to see.
+The highlights:
+Chest dropped another 0.5 cm to 98.0. That's your new all-time low, and it happened at maintenance calories. This means you're still slowly recomping — losing fat while eating at 2,400. This is the maintenance sweet spot.
+Waist down to 86 from 87. Another quiet improvement without being in a deficit.
+Shoulders bounced back to 117 from 115.5. That's the creatine resaturating — exactly as predicted. Your muscles are filling back out.
+Thigh at 57.8 is a new measurement to track — useful baseline for Cut B.
+Weight averaging 76.3, down from 76.5 last week. Slowly drifting down while eating at maintenance tells you your TDEE with the cycling might be slightly above 2,400.
+On the body fat readings: every single method ticked down this week. Scale dropped 0.3%, Navy dropped 0.8%, Deurenberg dropped 0.2%. The absolute numbers are all wrong for different reasons we've discussed, but when they all move in the same direction simultaneously, the trend is real. You're getting leaner.
+Your average of Navy and Deurenberg at 21.5% is actually landing right where my estimate has been. That's a reasonable number to track as your working body fat percentage going forward.
+Assessment: maintenance is working perfectly. You're not gaining fat, you're quietly recomping, measurements are stable or improving, and your routine is locked in. One more week like this and you're ready for July 13.</div></div></div></div></div>
 <div class="toast" id="tst"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -604,101 +627,45 @@ document.getElementById('home-btn').addEventListener('click',()=>jtt());
 ['prog','meas','week'].forEach(v=>{document.getElementById('vt-'+v).addEventListener('click',()=>{CV=v;['prog','meas','week'].forEach(id=>document.getElementById('vt-'+id).classList.toggle('act',v===id));document.getElementById('lv').classList.add('hide');document.getElementById('pv').classList.toggle('open',v==='prog');document.getElementById('mv').classList.toggle('open',v==='meas');document.getElementById('wv').classList.toggle('open',v==='week');if(v==='prog')rdrProg();if(v==='meas')rdrMeas();if(v==='week')rdrWeek();});});
 function showLog(){CV='log';['prog','meas','week'].forEach(id=>{document.getElementById('vt-'+id).classList.remove('act');});document.getElementById('lv').classList.remove('hide');document.getElementById('pv').classList.remove('open');document.getElementById('mv').classList.remove('open');document.getElementById('wv').classList.remove('open');}
 // Ribbon
-// ── Ribbon: fixed 7-tile window, drag scrolls through all dates ──────────
-const TILE_W=59;
-let _ribDrag=false,_ribX0=0,_ribSO0=0,_ribDelta=0;
-let _ribInited=false;
-
+// ── Ribbon: static 7-day view, always Sat–Fri of current week ────────────
 function rdrS(){
-  const el=document.getElementById('sg');
-  const to=tOff();const centre=SO!==null?SO:to;
-  const maxO=TW*7-1;
-  // Build or update 7 tiles
-  if(el.children.length!==7){
-    el.innerHTML='';
-    for(let i=0;i<7;i++){
-      const cell=document.createElement('div');cell.className='dc';el.appendChild(cell);
-    }
-  }
-  Array.from(el.children).forEach((cell,i)=>{
-    const rel=i-3;let o=Math.max(0,Math.min(maxO,centre+rel));
+  const el=document.getElementById('sg');el.innerHTML='';
+  const to=tOff();
+  // Week starts at Saturday — offset 0 is Sat (PS=2026-06-20=Sat)
+  const weekStart=w2o(CW); // first day of current week (always a Saturday)
+  for(let i=0;i<7;i++){
+    const o=weekStart+i;
+    if(o<0||o>=TW*7)continue;
     const sv=!!SV[o];const sl=DS[o];const dc=(!isR(o)&&sl)?SC[sl]:'';
-    let cls='dc';if(o<to)cls+=' past';if(o===to)cls+=' tdc';if(o===centre)cls+=' adc';if(isR(o))cls+=' rdc';if(sv)cls+=' ldc';
+    const cell=document.createElement('div');
+    let cls='dc';
+    if(o<to)cls+=' past';
+    if(o===to)cls+=' tdc';
+    if(o===SO)cls+=' adc';
+    if(isR(o))cls+=' rdc';
+    if(sv)cls+=' ldc';
     cell.className=cls;cell.dataset.off=o;
-    const sessLabel=isR(o)?'<div class="dsd" style="color:#c8897a">R</div>':(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
+    const sessLabel=isR(o)
+      ?'<div class="dsd" style="color:#c8897a">R</div>'
+      :(sl?'<div class="dsd" style="'+(dc?'color:'+dc+';':'')+'">'+sl+'</div>':'<div class="dsd">—</div>');
     cell.innerHTML='<div class="ddn">'+fmtD3(o)+'</div><div class="ddt">'+fmtDM(o)+'</div>'+sessLabel;
-    cell.onclick=()=>{if(Math.abs(_ribDelta)<5)selDay(o);};
-  });
-  // Size wrapper once
-  const rs=document.getElementById('rib-s');
-  if(rs)rs.style.width=(7*TILE_W-3)+'px';
-  // Init drag handlers once
-  if(!_ribInited){_ribInited=true;initRibDrag();}
-  // Wire week tabs click-drag once
-  const wts2=document.querySelector('.wts');
-  if(wts2&&!wts2._dw){wts2._dw=true;let d=false,x0=0,sl0=0;
-    wts2.addEventListener('mousedown',e=>{d=true;x0=e.pageX;sl0=wts2.scrollLeft;wts2.style.cursor='grabbing';e.preventDefault();});
-    window.addEventListener('mousemove',e=>{if(!d)return;wts2.scrollLeft=sl0-(e.pageX-x0);});
-    window.addEventListener('mouseup',()=>{if(d){d=false;wts2.style.cursor='';}});}
-}
-
-function initRibDrag(){
-  const rs=document.getElementById('rib-s');
-  const el=document.getElementById('sg');
-  if(!rs||!el)return;
-
-  const onStart=(clientX)=>{
-    _ribDrag=true;_ribX0=clientX;_ribSO0=SO;_ribDelta=0;
-  };
-  const onMove=(clientX)=>{
-    if(!_ribDrag)return;
-    _ribDelta=clientX-_ribX0;
-    const maxO=TW*7-1;
-    let ns=_ribSO0+Math.round(-_ribDelta/TILE_W);
-    // Rubber-band
-    if(ns<0)ns=Math.round(ns*0.25);
-    else if(ns>maxO)ns=maxO+Math.round((ns-maxO)*0.25);
-    SO=Math.max(-5,Math.min(maxO+5,ns));
-    rdrS();
-  };
-  const onEnd=()=>{
-    if(!_ribDrag)return;
-    _ribDrag=false;
-    SO=Math.max(0,Math.min(TW*7-1,SO));
-    // Snap to Saturday of week
-    SO=SO-(SO%7);
-    CW=o2w(SO);
-    rdrW();rdrS();rdrSA();
-  };
-
-  // Mouse — attach to window so drag works outside element
-  rs.addEventListener('mousedown',e=>{e.preventDefault();onStart(e.clientX);});
-  window.addEventListener('mousemove',e=>{if(_ribDrag){e.preventDefault();onMove(e.clientX);}});
-  window.addEventListener('mouseup',()=>{if(_ribDrag)onEnd();});
-
-  // Touch
-  let _touchStartY=0;
-  rs.addEventListener('touchstart',e=>{
-    _touchStartY=e.touches[0].clientY;
-    onStart(e.touches[0].clientX);
-  },{passive:true});
-  rs.addEventListener('touchmove',e=>{
-    if(!_ribDrag)return;
-    const dx=Math.abs(e.touches[0].clientX-_ribX0);
-    const dy=Math.abs(e.touches[0].clientY-_touchStartY);
-    // Only hijack if clearly horizontal (dx > dy and more than 4px moved)
-    if(dx>dy&&dx>4){
-      e.preventDefault();
-      onMove(e.touches[0].clientX);
-    }
-  },{passive:false});
-  rs.addEventListener('touchend',e=>{setTimeout(onEnd,40);},{passive:true});
+    cell.addEventListener('click',()=>selDay(o));
+    el.appendChild(cell);
+  }
 }
 function selDay(o){SO=o;CW=o2w(o);if(!isR(o)&&DS[o])CS=DS[o];showLog();rdrW();rdrS();rdrSA();}
-function rdrSel(){rdrS();}
+function rdrSel(){
+  const to=tOff();
+  document.querySelectorAll('#sg .dc').forEach(c=>{
+    const o=parseInt(c.dataset.off);
+    c.classList.toggle('past',o<to);
+    c.classList.toggle('tdc',o===to);
+    c.classList.toggle('adc',o===SO);
+  });
+}
 function rdrW(){
   const el=document.getElementById('wt');el.innerHTML='';
-  for(let w=1;w<=TW;w++){const ph=phFor(dfo(w2o(w)+6));const col=phCol(ph);const b=document.createElement('button');b.className='wb'+(w===CW?' aw':'');b.textContent='W'+w;if(col){b.style.borderColor=col;if(w===CW){b.style.background=col+'18';b.style.color=col;b.style.borderWidth='2px';}}b.addEventListener('click',()=>{CW=w;SO=w2o(w)+3;rdrW();rdrS();rdrSA();});el.appendChild(b);}
+  for(let w=1;w<=TW;w++){const ph=phFor(dfo(w2o(w)+6));const col=phCol(ph);const b=document.createElement('button');b.className='wb'+(w===CW?' aw':'');b.textContent='W'+w;if(col){b.style.borderColor=col;if(w===CW){b.style.background=col+'18';b.style.color=col;b.style.borderWidth='2px';}}b.addEventListener('click',()=>{CW=w;SO=w2o(w);rdrW();rdrS();rdrSA();});el.appendChild(b);}
   setTimeout(()=>{const a=el.querySelector('.wb.aw');if(a)a.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});},50);
 }
 function scrollToWeek(w){const cell=document.querySelector('#sg .dc[data-off="'+w2o(w)+'"]');if(cell)cell.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});}
@@ -732,7 +699,7 @@ function rdrSA(){
   const pbw=document.createElement('div');pbw.className='pb';pbw.innerHTML='<div class="pbi c-'+CS.toLowerCase()+'" id="pb" style="width:0%"></div>';wrapper.appendChild(pbw);
   if(isPast){const lkb=document.createElement('div');lkb.className='lkb';lkb.innerHTML='<span style="font-size:12px;color:var(--ts)">'+(lkd?'🔒':'🔓')+' '+fmt(dfo(o))+' — saved</span><div class="lt2"><span class="lto '+(lkd?'lk':'')+'" data-lk="1">🔒 Locked</span><span class="lto '+(!lkd?'ul':'')+'" data-lk="0">🔓 Unlocked</span></div>';lkb.querySelectorAll('.lto').forEach(b=>b.addEventListener('click',()=>{const sl=b.dataset.lk==='1';const k=lk(o,CS);if(sl)UL.delete(k);else UL.add(k);rdrSA();}));wrapper.appendChild(lkb);}
   const tblWrap=document.createElement('div');tblWrap.style.cssText='overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -2px';
-  const tbl=document.createElement('table');tbl.className='ext';tbl.style.minWidth='480px';tbl.innerHTML='<thead><tr><th style="width:4%"></th><th style="width:24%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:38%">Flag</th></tr></thead><tbody id="tb"></tbody>';tblWrap.appendChild(tbl);wrapper.appendChild(tblWrap);
+  const tbl=document.createElement('table');tbl.className='ext';tbl.style.minWidth='520px';tbl.innerHTML='<thead><tr><th style="width:3%"></th><th style="width:4%"></th><th style="width:23%">Exercise</th><th style="width:5%"></th><th style="width:9%">Sets</th><th style="width:10%">Reps</th><th style="width:10%">kg</th><th style="width:36%">Flag</th></tr></thead><tbody id="tb"></tbody>';tblWrap.appendChild(tbl);wrapper.appendChild(tblWrap);
   const existingNote=NT['n_'+o]||'';
   const nta=document.createElement('textarea');nta.className='nt';nta.id='nt';nta.placeholder='Session notes…';if(lkd)nta.disabled=true;nta.style.display=existingNote?'block':'none';nta.value=existingNote;wrapper.appendChild(nta);
   if(!lkd){const aeb=document.createElement('button');aeb.className='add-ex';aeb.textContent='+ Add exercise';aeb.addEventListener('click',addExRow);const ntb=document.createElement('button');ntb.className='add-ex';ntb.style.marginTop='0';ntb.textContent='＋ Session note';if(existingNote)ntb.style.display='none';ntb.addEventListener('click',()=>{nta.style.display='block';nta.focus();ntb.style.display='none';});const ar=document.createElement('div');ar.className='ar';const svb=document.createElement('button');svb.className='svb';svb.textContent='Save session';svb.addEventListener('click',saveS);ar.appendChild(svb);ar.appendChild(aeb);ar.appendChild(ntb);wrapper.appendChild(ar);}
@@ -793,8 +760,8 @@ function rdrTable(){
     const cS=gCS(o,CS,id);const cR=gCR(o,CS,id);
     let fa=[];if(!isN){if(isSk)fa=[{c:'fn',l:'skipped'}];else if(sv2[0]!==null&&sv2[1]!==null&&prv)fa=gF(sv2[0],sv2[1],cS,prv.wt,prv.rp,prv.sets||3,cR);else if(sv2[0]!==null||sv2[1]!==null)fa=[{c:'fn',l:'baseline'}];else if(isPre)fa=[{c:'fn',l:'prev'}];else fa=[{c:'fn',l:'—'}];}
     const tr=document.createElement('tr');tr.className=[(isOn?'dn':''),(isSk?' sk':''),(lkd?' lk':'')].join('');
-    // Column order: ✓ | Exercise | ✎ | ⊘ | Sets | Reps | kg | Flag
-    tr.innerHTML='<td style="width:4%"><button class="ck'+(isOn?' on':'')+'"'+(lkd?' disabled':'')+'>'+(isOn?'✓':'')+'</button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">'+(isN?'<span style="color:var(--tm);font-weight:400;font-size:11px">tap ✎ to pick</span>':ex.n)+'</div>'+(!lkd?'<button class="pb2" data-idx="'+idx+'">✎</button>':'')+'</div>'+(!isN?'<div class="et">'+ex.t+'</div>':'')+'<div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb'+(isSk?' on':'')+'" style="opacity:'+(isSk?'1':'.38')+';color:'+(isSk?'var(--aa)':'var(--tm)')+'" '+(isN||lkd?'disabled':'')+'>⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="'+(isN?'':cS)+'" data-idx="'+idx+'" data-field="sets" placeholder="3" '+(isN||lkd?'disabled':'')+'></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="'+(fr!==null?fr:'')+'" style="'+(isPre?'opacity:.6;':'')+'" data-eid="'+id+'" data-f="r" placeholder="—" '+(isN||lkd?'disabled':'')+'></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="'+(fw!==null&&fw!==0?fw:'')+'" style="'+(isPre?'opacity:.6;':'')+'" data-eid="'+id+'" data-f="w" placeholder="'+(ex&&BW.has(id)?'BW':'—')+'" '+(isN||lkd?'disabled':'')+'></td><td style="width:38%">'+fH(fa)+'</td>';
+    // Column order: ⠿ | ✓ | Exercise | ✎ | ⊘ | Sets | Reps | kg | Flag
+    tr.innerHTML=(!lkd&&!isN?'<td style="width:3%"><span class="drag-handle" title="Drag to reorder">⠿</span></td>':'<td style="width:3%"></td>')+'<td style="width:4%"><button class="ck'+(isOn?' on':'')+'"'+(lkd?' disabled':'')+'>'+(isOn?'✓':'')+'</button></td><td class="etd" style="width:24%"><div class="enw"><div class="en">'+(isN?'<span style="color:var(--tm);font-weight:400;font-size:11px">tap ✎ to pick</span>':ex.n)+'</div>'+(!lkd?'<button class="pb2" data-idx="'+idx+'">✎</button>':'')+'</div>'+(!isN?'<div class="et">'+ex.t+'</div>':'')+'<div class="pkr"><input type="text" placeholder="Search…"><div class="pkl"></div></div></td><td style="width:5%"><button class="pb2 skb'+(isSk?' on':'')+'" style="opacity:'+(isSk?'1':'.38')+';color:'+(isSk?'var(--aa)':'var(--tm)')+'" '+(isN||lkd?'disabled':'')+'>⊘</button></td><td style="width:9%"><input class="nsi" type="text" value="'+(isN?'':cS)+'" data-idx="'+idx+'" data-field="sets" placeholder="3" '+(isN||lkd?'disabled':'')+'></td><td style="width:10%"><input class="ni" type="number" min="0" step="1" value="'+(fr!==null?fr:'')+'" style="'+(isPre?'opacity:.6;':'')+'" data-eid="'+id+'" data-f="r" placeholder="—" '+(isN||lkd?'disabled':'')+'></td><td style="width:10%"><input class="ni" type="number" min="0" step="0.5" value="'+(fw!==null&&fw!==0?fw:'')+'" style="'+(isPre?'opacity:.6;':'')+'" data-eid="'+id+'" data-f="w" placeholder="'+(ex&&BW.has(id)?'BW':'—')+'" '+(isN||lkd?'disabled':'')+'></td><td style="width:38%">'+fH(fa)+'</td>';
     tb.appendChild(tr);
     if(!lkd){
       const pb2=tr.querySelector('.etd .pb2');if(pb2)pb2.addEventListener('click',e=>{e.stopPropagation();oPkr(tr.querySelector('.etd'),idx,id,o);});
@@ -817,6 +784,86 @@ function rdrTable(){
     }
   });
   const nt=document.getElementById('nt');if(nt)nt.value=NT['n_'+aOff()]||'';updPB();
+  // Wire drag-to-reorder on handles (desktop + touch)
+  if(!lkd)wireReorder(tb,o,CS);
+}
+
+function wireReorder(tbody,o,s){
+  let dragIdx=null,dragRow=null;
+  const rows=()=>Array.from(tbody.querySelectorAll('tr'));
+
+  const getIdx=(tr)=>rows().indexOf(tr);
+
+  const onDragStart=(tr,idx)=>{
+    dragIdx=idx;dragRow=tr;
+    tr.classList.add('dragging-row');
+  };
+  const onDragOver=(tr)=>{
+    if(!dragRow||tr===dragRow)return;
+    rows().forEach(r=>r.classList.remove('drag-over'));
+    tr.classList.add('drag-over');
+  };
+  const onDrop=(tr)=>{
+    if(!dragRow)return;
+    const toIdx=getIdx(tr);
+    if(dragIdx===null||dragIdx===toIdx){cleanup();return;}
+    // Reorder gSEX
+    const ids=gSEX(o,s);
+    const moved=ids.splice(dragIdx,1)[0];
+    ids.splice(toIdx,0,moved);
+    sSEX(o,s,ids);
+    cleanup();
+    rdrTable();
+  };
+  const cleanup=()=>{
+    dragIdx=null;dragRow=null;
+    rows().forEach(r=>{r.classList.remove('dragging-row');r.classList.remove('drag-over');});
+  };
+
+  rows().forEach((tr,idx)=>{
+    const handle=tr.querySelector('.drag-handle');if(!handle)return;
+
+    // Mouse
+    handle.addEventListener('mousedown',e=>{
+      e.preventDefault();
+      onDragStart(tr,idx);
+      const onMove=e2=>{
+        const el=document.elementFromPoint(e2.clientX,e2.clientY);
+        const targetRow=el?el.closest('tr'):null;
+        if(targetRow&&tbody.contains(targetRow))onDragOver(targetRow);
+      };
+      const onUp=e2=>{
+        const el=document.elementFromPoint(e2.clientX,e2.clientY);
+        const targetRow=el?el.closest('tr'):null;
+        if(targetRow&&tbody.contains(targetRow))onDrop(targetRow);
+        else cleanup();
+        window.removeEventListener('mousemove',onMove);
+        window.removeEventListener('mouseup',onUp);
+      };
+      window.addEventListener('mousemove',onMove);
+      window.addEventListener('mouseup',onUp);
+    });
+
+    // Touch
+    handle.addEventListener('touchstart',e=>{
+      e.preventDefault();
+      onDragStart(tr,idx);
+    },{passive:false});
+    handle.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      const t=e.touches[0];
+      const el=document.elementFromPoint(t.clientX,t.clientY);
+      const targetRow=el?el.closest('tr'):null;
+      if(targetRow&&tbody.contains(targetRow))onDragOver(targetRow);
+    },{passive:false});
+    handle.addEventListener('touchend',e=>{
+      const t=e.changedTouches[0];
+      const el=document.elementFromPoint(t.clientX,t.clientY);
+      const targetRow=el?el.closest('tr'):null;
+      if(targetRow&&tbody.contains(targetRow))onDrop(targetRow);
+      else cleanup();
+    });
+  });
 }
 function updPB(){const o=aOff();const bar=document.getElementById('pb');if(!bar)return;const ids=gSEX(o,CS).filter(id=>id&&!id.startsWith('__new__'));const acc=ids.filter(id=>CK[ckk(o,CS,id)]||SK[skk(o,CS,id)]).length;bar.style.width=Math.round(acc/Math.max(ids.length,1)*100)+'%';bar.className='pbi c-'+CS.toLowerCase();}
 function saveS(){const o=aOff();if(isR(o)){toast('Rest day');return;}if(isLk(o,CS)){toast('Session locked');return;}const ids=gSEX(o,CS);let n=0;ids.forEach((id,idx)=>{if(!id||id.startsWith('__new__'))return;const wi=document.querySelector('[data-eid="'+id+'"][data-f="w"]');const ri=document.querySelector('[data-eid="'+id+'"][data-f="r"]');const wv=wi&&wi.value!==''?parseFloat(wi.value):null;const rv=ri&&ri.value!==''?parseInt(ri.value):null;if(wv!==null||rv!==null){DT[dkd(o,CS,id)]=[wv,rv];n++;}const si=document.querySelector('[data-field="sets"][data-idx="'+idx+'"]');if(si&&si.value){const ov=OV[ovk(o,CS,id)]||{};OV[ovk(o,CS,id)]={sets:si.value,r:ov.r||lbi(id).r};}});const nt=document.getElementById('nt');const nv=nt?nt.value.trim():(NT['n_'+o]||'');if(nv)NT['n_'+o]=nv;else delete NT['n_'+o];DS[o]=CS;SV[o]=1;if(o<tOff())UL.delete(lk(o,CS));persist();rdrS();rdrSA();toast('Saved — W'+o2w(o)+' '+CS+' ('+n+' exercises)');}
@@ -964,18 +1011,24 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
     ?{suggestedMin:opts.yMin,suggestedMax:opts.yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}
     :{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:opts&&opts.beginAtZero?true:false};
 
-  // afterDraw plugin — copies y-axis region to sticky overlay canvas
+  // afterDraw plugin — copies y-axis region to sticky overlay canvas, DPI-aware
   const stickyYPlugin={
     id:'stickyY_'+canvasId,
     afterDraw(chart){
       const yScale=chart.scales.y;if(!yScale)return;
       const ov=document.getElementById(canvasId+'_yov');if(!ov)return;
-      const yW=Math.ceil(yScale.width)+2;const cH=chart.canvas.height;
-      ov.width=yW;ov.height=cH;ov.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
+      const dpr=window.devicePixelRatio||1;
+      const yW=Math.ceil(yScale.width)+2;
+      // Physical pixel dimensions of the source canvas
+      const srcW=chart.canvas.width;   // already scaled by DPR by Chart.js
+      const srcH=chart.canvas.height;  // already scaled by DPR by Chart.js
+      // Set overlay canvas to match DPR so it renders crisp
+      ov.width=Math.round(yW*dpr);
+      ov.height=srcH;
+      ov.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
       const octx=ov.getContext('2d');
-      octx.drawImage(chart.canvas,0,0,yW*window.devicePixelRatio||yW,cH,0,0,yW,cH);
-      // Padding so chart content isn't hidden behind overlay — set scroll padding
-      scroll.style.paddingLeft='0';
+      // Copy exactly the y-axis region at physical pixel resolution
+      octx.drawImage(chart.canvas,0,0,Math.round(yW*dpr),srcH,0,0,Math.round(yW*dpr),srcH);
     }
   };
 
@@ -985,8 +1038,8 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
     plugins:[stickyYPlugin],
     options:{
       responsive:false,maintainAspectRatio:false,
-      interaction:{mode:'nearest',intersect:true},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{display:false},tooltip:{filter:item=>item.parsed.y!==null,callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},
       scales:{
         x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},
         y:yScaleCfg
@@ -1005,7 +1058,7 @@ function mkChart(canvasId,scrollId,datasets,yUnit,labels,height){
   canvas.setAttribute('width',minW);canvas.setAttribute('height',h);
   canvas.style.cssText='height:'+h+'px;display:block';
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
 }
 // Measurements
 document.getElementById('mab').addEventListener('click',()=>{const f=document.getElementById('mf2');f.classList.toggle('open');if(f.classList.contains('open')){document.getElementById('mfd').value=fISO(now());bMI();}});
@@ -1059,7 +1112,7 @@ function mkChartZoom(canvasId,scrollId,datasets,yUnit,labels,height,yMin,yMax){
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
   const minW=Math.max(labels.length*56,320);const scroll=document.getElementById(scrollId);if(scroll)scroll.style.overflowX='auto';
   const h2=height||200;canvas.setAttribute('width',minW);canvas.setAttribute('height',h2);canvas.style.cssText='height:'+h2+'px;display:block';
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{suggestedMin:yMin,suggestedMax:yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{suggestedMin:yMin,suggestedMax:yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}}}});
 }
 // BF% chart — 36px per point
 function mkChartBF(canvasId,scrollId,datasets,yUnit,labels,height){
@@ -1069,7 +1122,7 @@ function mkChartBF(canvasId,scrollId,datasets,yUnit,labels,height){
   const validDs=datasets.filter(ds=>ds.data.some(v=>v!==null));
   const minW=Math.max(labels.length*36,200);const scroll=document.getElementById(scrollId);if(scroll)scroll.style.overflowX='auto';
   canvas.style.width=minW+'px';canvas.style.height=(height||200)+'px';
-  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
+  CHT[canvasId]=new Chart(canvas,{type:'line',data:{labels,datasets:validDs},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},scales:{x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:false}}}});
 }
 function rdrMHT(){
   const table=document.getElementById('mht');table.innerHTML='';const dates=Object.keys(MEAS).sort((a,b)=>a>b?-1:1);
@@ -1113,7 +1166,7 @@ function buildCalChart(el){
     {label:'S3 '+SM.S3.d.split(' · ')[0],data:s3d,borderColor:SC.S3,backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:0.3,spanGaps:false},
     {label:'Total',data:totd,borderColor:'#52525b',backgroundColor:'transparent',borderWidth:2,borderDash:[5,3],pointRadius:3,tension:0.3,spanGaps:false},
   ];
-  CHT.wjcal=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'nearest',intersect:true},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y?c.parsed.y.toLocaleString()+' kcal':'—')}}},scales:{x:{ticks:{font:{size:9},color:tc},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+' kcal',maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:true}}}});
+  CHT.wjcal=new Chart(canvas,{type:'line',data:{labels,datasets},options:{responsive:false,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+(c.parsed.y?c.parsed.y.toLocaleString()+' kcal':'—')}}},scales:{x:{ticks:{font:{size:9},color:tc},grid:{display:false},border:{display:false}},y:{ticks:{font:{size:9},color:tc,callback:v=>v+' kcal',maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:true}}}});
 }
 function rdrWeek(){
   const el=document.getElementById('wc2');el.innerHTML='';
