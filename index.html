@@ -245,7 +245,7 @@ textarea.nt:disabled{opacity:.45;background:transparent;border-color:transparent
 .chs{overflow-x:auto;scrollbar-width:thin;position:relative}
 .chs::-webkit-scrollbar{height:3px}
 .chs::-webkit-scrollbar-thumb{background:var(--b1);border-radius:2px}
-.chs-wrap{position:relative;overflow:hidden}
+.chs-wrap{position:relative}
 .y-overlay{position:absolute;top:0;left:0;pointer-events:none;z-index:2}
 .pe{font-size:13px;color:var(--tm);padding:2rem 0;text-align:center}
 /* Measurements */
@@ -1135,9 +1135,12 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
   const minW=Math.max(labels.length*pxPerPt,320);
   const h=height||150;
 
-  // Wrap: sticky y-axis overlay + scrollable chart
+  // Wrap: sticky y-axis overlay + scrollable chart. The wrap must be exactly as wide
+  // as the canvas — otherwise it defaults to 100% of the scroll container's width and
+  // (with overflow hidden) clips the wide canvas instead of letting .chs scroll it.
   let wrap=scroll.querySelector('.chs-wrap');
   if(!wrap){wrap=document.createElement('div');wrap.className='chs-wrap';scroll.appendChild(wrap);}
+  wrap.style.width=minW+'px';
   wrap.innerHTML='';
   const yOvCanvas=document.createElement('canvas');yOvCanvas.className='y-overlay';yOvCanvas.id=canvasId+'_yov';
   wrap.appendChild(yOvCanvas);
@@ -1151,7 +1154,8 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
     ?{suggestedMin:opts.yMin,suggestedMax:opts.yMax,ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:6},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false}}
     :{ticks:{font:{size:9},color:tc,callback:v=>v+yUnit,maxTicksLimit:5},grid:{color:'rgba(0,0,0,0.06)'},border:{display:false},beginAtZero:opts&&opts.beginAtZero?true:false};
 
-  // afterDraw plugin — copies y-axis region to sticky overlay canvas, DPI-aware
+  // afterDraw plugin — copies y-axis region to a sticky overlay canvas so it stays
+  // pinned to the visible left edge while the chart scrolls, DPI-aware
   const stickyYPlugin={
     id:'stickyY_'+canvasId,
     afterDraw(chart){
@@ -1165,7 +1169,7 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
       // Set overlay canvas to match DPR so it renders crisp
       ov.width=Math.round(yW*dpr);
       ov.height=srcH;
-      ov.style.cssText='position:absolute;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
+      ov.style.cssText='position:sticky;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
       const octx=ov.getContext('2d');
       // Copy exactly the y-axis region at physical pixel resolution
       octx.drawImage(chart.canvas,0,0,Math.round(yW*dpr),srcH,0,0,Math.round(yW*dpr),srcH);
@@ -1178,7 +1182,7 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
     plugins:[stickyYPlugin],
     options:{
       responsive:false,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
+      interaction:{mode:'nearest',intersect:false},
       plugins:{legend:{display:false},tooltip:{filter:item=>item.parsed.y!==null,callbacks:{label:c=>c.dataset.label+(c.parsed.y!==null?' '+c.parsed.y+yUnit:'')}}},
       scales:{
         x:{ticks:{font:{size:9},color:tc,maxRotation:0},grid:{display:false},border:{display:false}},
@@ -1206,8 +1210,8 @@ function rdrBFG(){
   setTimeout(()=>{const bw=document.getElementById('bfgw');const ml=document.getElementById('bfgml');if(!bw||!ml)return;BF_MS.forEach(m=>{if(m>=sv||m<=goal)return;const pos=(sv-m)/(sv-goal);const mk=document.createElement('div');mk.className='bfgt-m';mk.style.left=(pos*100)+'%';bw.appendChild(mk);const lb=document.createElement('div');lb.className='bfgt-mll';lb.style.left=(pos*100)+'%';lb.textContent=m+'%';ml.appendChild(lb);});const cm=document.createElement('div');cm.className='bfgt-cm';cm.style.left=(prog*100)+'%';bw.appendChild(cm);},50);
 }
 // ── Period aggregation helpers for measurement charts (Log / Month / Year) ──
-function periodKey(dateStr,mode){const d=new Date(dateStr+'T00:00:00');if(mode==='year')return String(d.getFullYear());return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
-function periodLabel(key,mode){if(mode==='year')return key;const p=key.split('-');return MN[parseInt(p[1])-1]+' '+p[0];}
+function periodKey(dateStr,mode){if(mode==='week'){const off=isoToOff(dateStr);return 'W'+String(o2w(off)).padStart(2,'0');}const d=new Date(dateStr+'T00:00:00');if(mode==='year')return String(d.getFullYear());return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');}
+function periodLabel(key,mode){if(mode==='week')return 'W'+parseInt(key.slice(1),10);if(mode==='year')return key;const p=key.split('-');return MN[parseInt(p[1])-1]+' '+p[0];}
 function computePeriods(allDates,mode){
   if(mode==='log')return{keys:allDates,labels:allDates.map(fmtDNY)};
   const seen=new Set();const keys=[];
@@ -1223,7 +1227,7 @@ function aggSeries(allDates,valueFn,mode,keys){
 }
 function mkPeriodToggle(chartKey,onChange){
   const tg=document.createElement('div');tg.className='wj-tg';
-  [{v:'log',l:'Log'},{v:'month',l:'Month'},{v:'year',l:'Year'}].forEach(opt=>{
+  [{v:'log',l:'Log'},{v:'week',l:'Week'},{v:'month',l:'Month'},{v:'year',l:'Year'}].forEach(opt=>{
     const o=document.createElement('div');o.className='wj-to'+(measFilters[chartKey]===opt.v?' sel':'');o.textContent=opt.l;
     o.addEventListener('click',()=>{if(measFilters[chartKey]===opt.v)return;measFilters[chartKey]=opt.v;onChange();});
     tg.appendChild(o);
