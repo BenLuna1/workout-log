@@ -1142,8 +1142,16 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
   if(!wrap){wrap=document.createElement('div');wrap.className='chs-wrap';scroll.appendChild(wrap);}
   wrap.style.width=minW+'px';
   wrap.innerHTML='';
+  // Zero-footprint sticky holder: position:sticky keeps an element in normal document
+  // flow (unlike position:absolute), so a plain sticky canvas would push the real chart
+  // down below it. Giving the holder width/height:0 with overflow:visible means it
+  // contributes no layout space, while its child (the overlay canvas) still renders at
+  // its full size, visually overlaying the chart instead of stacking above it.
+  const stickyHolder=document.createElement('div');
+  stickyHolder.style.cssText='position:sticky;top:0;left:0;width:0;height:0;overflow:visible;z-index:2;';
   const yOvCanvas=document.createElement('canvas');yOvCanvas.className='y-overlay';yOvCanvas.id=canvasId+'_yov';
-  wrap.appendChild(yOvCanvas);
+  stickyHolder.appendChild(yOvCanvas);
+  wrap.appendChild(stickyHolder);
   wrap.appendChild(canvas);
 
   // Full-width canvas
@@ -1169,7 +1177,7 @@ function mkC(canvasId,scrollId,datasets,yUnit,labels,height,opts){
       // Set overlay canvas to match DPR so it renders crisp
       ov.width=Math.round(yW*dpr);
       ov.height=srcH;
-      ov.style.cssText='position:sticky;top:0;left:0;pointer-events:none;z-index:2;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
+      ov.style.cssText='display:block;pointer-events:none;height:'+h+'px;width:'+yW+'px;background:var(--bg-section)';
       const octx=ov.getContext('2d');
       // Copy exactly the y-axis region at physical pixel resolution
       octx.drawImage(chart.canvas,0,0,Math.round(yW*dpr),srcH,0,0,Math.round(yW*dpr),srcH);
